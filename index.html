@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mi Oposición — Técnico Deportivo CSD</title>
+<style>
+  :root {
+    --bg: #f5f7fa; --card: #ffffff; --ink: #1a2733; --muted: #5b6b7a;
+    --accent: #1f4e78; --accent-light: #e8f0f7; --good: #1e8e5a; --good-light:#e6f6ee;
+    --bad: #c0392b; --bad-light:#fdecea; --border: #e2e8f0; --warn:#b8860b;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+  header {
+    background:var(--accent); color:#fff; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  header h1 { font-size:18px; margin:0; }
+  header .sub { font-size:12px; opacity:.85; }
+  nav.tabs { display:flex; gap:6px; padding:10px 24px; background:#fff; border-bottom:1px solid var(--border); flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  nav.tabs button {
+    border:none; background:transparent; padding:9px 16px; border-radius:8px; cursor:pointer; font-size:14px; color:var(--muted); font-weight:600;
+  }
+  nav.tabs button.active { background:var(--accent-light); color:var(--accent); }
+  main { max-width:980px; margin:0 auto; padding:20px 24px 60px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
+  .card h2 { font-size:16px; margin:0 0 12px; color:var(--accent); }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:700px){ .grid4{grid-template-columns:repeat(2,1fr);} .grid2{grid-template-columns:1fr;} }
+  .stat .num { font-size:22px; font-weight:700; color:var(--accent); }
+  .stat .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.02em; }
+  .progress-track { background:#e2e8f0; border-radius:8px; height:10px; overflow:hidden; margin-top:10px; }
+  .progress-fill { background:var(--accent); height:100%; border-radius:8px; transition:width .4s; }
+  .rank-badge { display:inline-flex; align-items:center; gap:8px; background:var(--accent-light); color:var(--accent); font-weight:700; padding:6px 14px; border-radius:999px; font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { color:var(--muted); font-size:11px; text-transform:uppercase; }
+  .badge { display:inline-block; font-size:10px; padding:2px 8px; border-radius:999px; background:var(--accent-light); color:var(--accent); font-weight:700; margin-left:6px; }
+  .badge.good { background:var(--good-light); color:var(--good); }
+  .badge.warn { background:#fdf3e0; color:var(--warn); }
+  .bloque-list { display:flex; flex-direction:column; gap:8px; }
+  .bloque-row {
+    display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border); border-radius:10px; padding:12px 14px; cursor:pointer;
+  }
+  .bloque-row:hover { border-color:var(--accent); }
+  .bloque-row.current { background:var(--accent-light); border-color:var(--accent); }
+  .bloque-row .name { font-weight:700; font-size:14px; }
+  .bloque-row .desc { font-size:12px; color:var(--muted); }
+  .theory-body a { color:var(--accent); font-weight:600; }
+  .theory-body h3 { font-size:14px; color:var(--accent); margin:18px 0 6px; }
+  .theory-body p { font-size:13.5px; line-height:1.6; margin:0 0 10px; }
+  .theory-body ul { margin:0 0 10px 18px; padding:0; font-size:13.5px; line-height:1.6; }
+  .btn { background:var(--accent); color:#fff; border:none; padding:9px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .btn.secondary { background:#fff; color:var(--accent); border:1px solid var(--accent); }
+  .btn:disabled { opacity:.4; cursor:default; }
+  .btn-row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  select { padding:8px 10px; border-radius:8px; border:1px solid var(--border); font-size:13px; }
+  .opt { display:block; width:100%; text-align:left; padding:10px 12px; margin-bottom:8px; border:1px solid var(--border); border-radius:8px; background:#fff; cursor:pointer; font-size:13.5px; }
+  .opt:hover { border-color:var(--accent); }
+  .opt.correct { background:var(--good-light); border-color:var(--good); }
+  .opt.wrong { background:var(--bad-light); border-color:var(--bad); }
+  .quiz-q { font-weight:600; margin-bottom:10px; font-size:14px; }
+  .note { font-size:12px; color:var(--muted); margin-top:8px; }
+  .todo-item { display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .todo-item:last-child { border-bottom:none; }
+  .todo-item.done { color:var(--muted); }
+  .todo-item.done .todo-label { text-decoration:line-through; }
+  .todo-item input { width:16px; height:16px; }
+  .section-toggle { display:flex; gap:8px; margin-bottom:14px; }
+  .section-toggle button { flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--muted); }
+  .section-toggle button.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  footer.note { max-width:980px; margin:0 auto 40px; padding:0 24px; font-size:11.5px; color:var(--muted); text-align:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Mi Oposición — Técnico Deportivo (CSD)</h1>
+    <div class="sub">Personal laboral fijo fuera de convenio · Acceso libre · 1 plaza · Ciclo 2026/2027</div>
+  </div>
+  <div class="rank-badge" id="rankBadge">—</div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="inicio" class="active">Inicio</button>
+  <button data-tab="teoria">Teoría</button>
+  <button data-tab="practica">Practicar test</button>
+  <button data-tab="progreso">Progreso y ranking</button>
+</nav>
+
+<main>
+
+  <!-- INICIO -->
+  <section id="tab-inicio">
+    <div class="card">
+      <h2>Estado actual</h2>
+      <div class="grid4">
+        <div class="stat"><div class="num" id="statDias">—</div><div class="label">días hasta el examen</div></div>
+        <div class="stat"><div class="num" id="statFase">—</div><div class="label">fase del plan</div></div>
+        <div class="stat"><div class="num" id="statBloque">—</div><div class="label">bloque de hoy</div></div>
+        <div class="stat"><div class="num" id="statPct">—</div><div class="label">avance del calendario</div></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <h2>Bloque que toca hoy</h2>
+      <p id="hoyResumen" style="font-size:13.5px;color:var(--muted)"></p>
+      <div class="btn-row">
+        <button class="btn" id="btnIrTeoria">Leer teoría de hoy</button>
+        <button class="btn secondary" id="btnIrPractica">Practicar test de hoy</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Por hacer (próximas acciones)</h2>
+      <div id="todoPreview"></div>
+    </div>
+  </section>
+
+  <!-- TEORIA -->
+  <section id="tab-teoria" style="display:none">
+    <div class="card">
+      <h2>Bloques del temario</h2>
+      <div class="bloque-list" id="bloqueListTeoria"></div>
+    </div>
+    <div class="card" id="teoriaViewer" style="display:none">
+      <h2 id="teoriaTitulo"></h2>
+      <div class="theory-body" id="teoriaBody"></div>
+      <div class="btn-row">
+        <button class="btn" id="btnMarcarLeido">Marcar como leído</button>
+        <button class="btn secondary" id="btnDesdeTeoriaAPractica">Ir a practicar este bloque</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICA -->
+  <section id="tab-practica" style="display:none">
+    <div class="card">
+      <div class="section-toggle mode-toggle">
+        <button data-mode="bloque" class="active" id="modeBloqueBtn">Practicar por bloque</button>
+        <button data-mode="simulacro" id="modeSimulacroBtn">Simulacro completo (90 preguntas)</button>
+      </div>
+    </div>
+
+    <div id="practicaBloque">
+      <div class="card">
+        <h2>Elige bloque para practicar</h2>
+        <select id="selectBloqueQuiz"></select>
+        <button class="btn" id="btnEmpezarQuiz" style="margin-left:10px">Empezar test</button>
+      </div>
+      <div class="card" id="quizCard" style="display:none">
+        <h2 id="quizTitulo"></h2>
+        <div id="quizArea"></div>
+      </div>
+    </div>
+
+    <div id="practicaSimulacro" style="display:none">
+      <div class="card">
+        <h2>Simulacro completo — 90 preguntas / 90 minutos</h2>
+        <p class="note">Reproduce el formato real del primer ejercicio de la oposición: 90 preguntas tipo test extraídas al azar de todo el banco de preguntas del temario (actualmente <span id="simulacroPoolSize">—</span> preguntas grounded en las fuentes de tu notebook). Puntuación: cada 3 respuestas incorrectas restan 1 acierto; las respuestas en blanco no penalizan. La nota se escala sobre 40 puntos y se considera apto a partir de 20.</p>
+        <button class="btn" id="btnEmpezarSimulacro">Empezar simulacro (90 min)</button>
+      </div>
+      <div class="card" id="simulacroCard" style="display:none">
+        <h2 id="simulacroTitulo">Simulacro completo</h2>
+        <div class="grid4" style="margin-bottom:14px">
+          <div class="stat"><div class="num" id="simTimer">90:00</div><div class="label">tiempo restante</div></div>
+          <div class="stat"><div class="num" id="simProgresoNum">0/90</div><div class="label">pregunta</div></div>
+          <div class="stat"><div class="num" id="simAciertos">0</div><div class="label">aciertos</div></div>
+          <div class="stat"><div class="num" id="simErrores">0</div><div class="label">errores</div></div>
+        </div>
+        <div id="simulacroArea"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESO -->
+  <section id="tab-progreso" style="display:none">
+    <div class="card">
+      <h2>Ranking de cumplimiento</h2>
+      <div class="grid2">
+        <div>
+          <div class="rank-badge" id="rankBadge2" style="margin-bottom:10px">—</div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill2" style="width:0%"></div></div>
+          <p class="note" id="progresoTexto"></p>
+        </div>
+        <div>
+          <table>
+            <tr><th>Bloque</th><th>Teoría</th><th>Mejor test</th></tr>
+            <tbody id="tablaProgreso"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="note" id="simulacroResumen" style="margin-top:14px;font-size:13px"></p>
+    </div>
+    <div class="card">
+      <div class="section-toggle">
+        <button data-filter="pendiente" class="active">Por hacer</button>
+        <button data-filter="hecho">Realizadas</button>
+        <button data-filter="todas">Todas</button>
+      </div>
+      <div id="todoFull"></div>
+    </div>
+    <div class="card">
+      <h2>Reiniciar progreso</h2>
+      <p class="note">Borra las teorías marcadas como leídas y el historial de tests (no afecta a los ficheros del plan).</p>
+      <button class="btn secondary" id="btnReset">Reiniciar progreso</button>
+    </div>
+  </section>
+
+</main>
+<footer class="note">Contenido basado en el Informe de Planificación Estratégica y el temario de tu cuaderno de NotebookLM "VAMOS a por la plaza". El progreso se guarda en este navegador (localStorage) — ábrelo siempre desde el mismo ordenador/navegador para conservarlo.</footer>
+
+<script>
+/* ================= DATOS ================= */
+
+const calendario = [
+  ["2026-07-15","2026-07-27","b1","Constitucional y UE"],
+  ["2026-07-28","2026-08-03","b2","Contratación y Transparencia"],
+  ["2026-08-04","2026-08-10","b3","Función Pública y RRHH"],
+  ["2026-08-11","2026-08-24","b4","Presupuesto, PRL, Igualdad, CSD"],
+  ["2026-08-25","2026-09-14","b5","Ley 39/2022 del Deporte (Títs. III-IX)"],
+  ["2026-09-15","2026-09-21","b5b","Ley del Deporte, Título V"],
+  ["2026-09-22","2026-09-28","b7","Violencia, racismo, disciplina"],
+  ["2026-09-29","2026-10-05","b8","Temas institucionales"],
+  ["2026-10-06","2026-10-12","b9","Mecenazgo y fundaciones"],
+  ["2026-10-13","2026-10-26","b10","RD 971/2007, LGTBI, Carta Europea"],
+  ["2026-10-27","2026-10-31","repaso","Repaso Bloque Común"],
+  ["2026-11-01","2026-11-22","b6","Fisiología y entrenamiento"],
+  ["2026-11-23","2026-12-13","b6","Deporte colectivo/individual/adaptado"],
+  ["2026-12-14","2026-12-31","practica","Supuestos prácticos"],
+  ["2027-01-01","2027-01-31","repaso","Repaso transversal"],
+  ["2027-02-01","2027-02-28","repaso","Simulacro completo"],
+  ["2027-03-01","2027-03-31","repaso","Puesta a punto"],
+];
+const fases = [
+  { name:"Cimentación Teórica", start:"2026-07-15", end:"2026-10-31" },
+  { name:"Especialización", start:"2026-11-01", end:"2026-12-31" },
+  { name:"Integración y Simulación", start:"2027-01-01", end:"2027-02-28" },
+  { name:"Puesta a Punto", start:"2027-03-01", end:"2027-03-31" },
+];
+
+const bloques = [
+{
+  id:"b1", nombre:"Bloque 1", temas:"1-8", titulo:"Constitucional y Unión Europea",
+  docUrl:"https://drive.google.com/file/d/1lLt_HrBmQS9IFRttYqW-6ADBfALAnTmi/view",
+  teoria:[
+    {h:"Tema 1 — Título Preliminar y Título I CE (derechos y deberes)",p:"El Título Preliminar (arts. 1-9 CE) define España como Estado social y democrático de Derecho, con la soberanía nacional residiendo en el pueblo (art. 1) y forma política de Monarquía parlamentaria; consagra la unidad de la Nación y el derecho a la autonomía (art. 2), la cooficialidad lingüística (art. 3) y la jerarquía normativa y seguridad jurídica (art. 9.3). El Título I (arts. 10-55) regula derechos y libertades: mayoría de edad a los 18 años (art. 12), detención preventiva máxima de 72 horas (art. 17.2), libertades de expresión, reunión y asociación (arts. 20-22), y derecho de sufragio y acceso a cargos públicos (art. 23). El recurso de amparo ante el Tribunal Constitucional protege los derechos del art. 14 y la Sección 1ª del Cap. 2º (art. 53.2); el Defensor del Pueblo es un alto comisionado de las Cortes (art. 54)."},
+    {h:"Temas 2-3 — La Corona y las Cortes Generales (Títulos II-III CE)",p:"El Título II regula la Corona (arts. 56-65): el Rey es Jefe del Estado, inviolable y no sujeto a responsabilidad, con sus actos refrendados (art. 56.3); sus funciones incluyen sancionar leyes, proponer al Presidente del Gobierno, convocar referéndum y el mando supremo de las Fuerzas Armadas (art. 62). Si el Rey se inhabilita y el heredero es menor de edad, la Regencia recae en el padre/madre y, en su defecto, en el pariente mayor de edad más próximo a suceder. El Título III regula las Cortes Generales (arts. 66-96), bicamerales: el Congreso tiene entre 300 y 400 Diputados elegidos por 4 años (art. 68); el Senado, 4 Senadores por provincia más designados autonómicos (art. 69). Las leyes orgánicas requieren mayoría absoluta del Congreso en votación final (art. 81); la iniciativa popular exige no menos de 500.000 firmas (art. 87.3); los decretos-leyes deben convalidarse por el Congreso en 30 días (art. 86)."},
+    {h:"Tema 4 — Gobierno y relaciones Gobierno-Cortes (Títulos IV-V CE, Ley 50/1997)",p:"El Título IV CE (arts. 97-107) atribuye al Gobierno la función ejecutiva y potestad reglamentaria; la investidura exige mayoría absoluta en primera votación o simple 48 horas después (art. 99). El Título V regula la cuestión de confianza (mayoría simple, art. 112), la moción de censura constructiva (propuesta por al menos 1/10 de los Diputados, no votable hasta 5 días después, art. 113) y los estados de alarma (máx. 15 días, decreta el Gobierno), excepción (máx. 30+30 días, autoriza el Congreso) y sitio (declara el Congreso por mayoría absoluta) del art. 116. La Ley 50/1997 del Gobierno precisa que el Gobierno lo componen estrictamente el Presidente, el/los Vicepresidente/s (si los hay) y los Ministros —no los Secretarios de Estado—, y regula el Consejo de Ministros, las Comisiones Delegadas y el Gobierno en funciones (art. 21)."},
+    {h:"Tema 5 — Poder Judicial, Hacienda, Organización Territorial y TC (Títulos VI-X CE)",p:"El Título VI (arts. 117-127) consagra la independencia judicial; el Consejo General del Poder Judicial se compone del Presidente del TS más 20 vocales nombrados por 5 años (art. 122.3). El Título VII regula Hacienda y el Tribunal de Cuentas, supremo órgano fiscalizador dependiente de las Cortes (art. 136). El Título VIII organiza el Estado en municipios, provincias y CCAA (art. 137), con competencias exclusivas del Estado (art. 149) y de las CCAA (art. 148). El Título IX regula el Tribunal Constitucional: 12 miembros nombrados por 9 años, renovables por tercios cada 3 (art. 159). El Título X regula la reforma constitucional: ordinaria por 3/5 de cada Cámara (art. 167) y agravada (Título Preliminar, Título I Cap.2 Sección 1ª o Título II) por 2/3, disolución de Cortes y referéndum obligatorio (art. 168)."},
+    {h:"Temas 7-8 — Ley 40/2015 (LRJSP): organización de la AGE y sector público institucional",p:"La LRJSP fija los principios de actuación de las AAPP (art. 3: eficacia, jerarquía, descentralización, buena fe, transparencia) y regula la competencia como irrenunciable (art. 8), la delegación (art. 9, no delegable en disposiciones generales ni resolución de recursos por el propio órgano), la avocación (art. 10) y la encomienda de gestión (art. 11). La AGE se organiza en Organización Central, Territorial y Exterior (art. 55), con órganos superiores (Ministros, Secretarios de Estado) y órganos directivos (Subsecretarios, Secretarios generales, Secretarios generales técnicos, Directores y Subdirectores generales); los Delegados del Gobierno tienen rango de Subsecretario. El sector público institucional estatal (art. 84) integra organismos autónomos, entidades públicas empresariales, agencias estatales, autoridades administrativas independientes, sociedades mercantiles estatales, consorcios, fundaciones del sector público y fondos sin personalidad jurídica."},
+    {h:"Tema 6 — La Unión Europea: Tratados, instituciones y fuentes",p:"Contenido de naturaleza histórico-institucional: Declaración Schuman y CECA (1951), Tratados de Roma (1957), Acta Única (1986), Maastricht (1992, crea la UE), Ámsterdam (1997), Niza (2001) y Lisboa (2007, en vigor 2009). España se incorporó por el Tratado de Adhesión de 12 de junio de 1985, con efectos desde el 1 de enero de 1986. El derecho originario son los Tratados fundacionales; el derecho derivado (art. 288 TFUE) comprende el Reglamento (obligatorio y directamente aplicable sin transposición), la Directiva (obliga en cuanto al resultado, exige transposición), la Decisión (obligatoria para sus destinatarios) y recomendaciones/dictámenes no vinculantes. Rigen los principios de primacía y efecto directo del Derecho de la UE (arts. 93 y 96 CE)."},
+    {h:"Tema 8 — El Derecho Administrativo: concepto y fuentes",p:"El Derecho Administrativo regula la organización, actividad y control de las Administraciones Públicas, caracterizado por prerrogativas (autotutela, presunción de validez de los actos) y garantías (control contencioso-administrativo). Sus fuentes, según la jerarquía normativa del art. 9.3 CE, son: la Constitución; la Ley (orgánica y ordinaria) y normas con rango de ley (Decreto-ley, Decreto Legislativo, ambos con rango de ley pese a emanar del Gobierno); el Reglamento, como fuente propia del Derecho Administrativo (potestad reglamentaria, art. 97 CE); la costumbre y los principios generales (función supletoria, entre ellos el de proporcionalidad en la intervención administrativa); los Tratados Internacionales (art. 96 CE); y el Derecho de la Unión Europea."},
+  ],
+  quiz:[
+    {q:"Según el artículo 1 de la Constitución Española, ¿cuáles son los valores superiores del ordenamiento jurídico?",opts:["Libertad, justicia, igualdad y pluralismo político","Libertad, propiedad, seguridad y orden público","Democracia, monarquía, unidad y solidaridad","Igualdad, fraternidad, libertad y laicidad"],correct:0,note:"Art. 1.1 CE: libertad, justicia, igualdad y pluralismo político."},
+    {q:"¿Cuál es la forma política del Estado español según la Constitución?",opts:["República parlamentaria","Monarquía parlamentaria","Monarquía absoluta","Estado federal"],correct:1,note:"Art. 1.3 CE: la forma política del Estado español es la Monarquía parlamentaria."},
+    {q:"¿Cuánto puede durar como máximo la detención preventiva según el art. 17.2 CE?",opts:["24 horas","48 horas","72 horas","96 horas"],correct:2,note:"Art. 17.2 CE: la detención preventiva no puede durar más del tiempo estrictamente necesario, con el límite máximo de 72 horas.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"Si el Rey se inhabilitare para el ejercicio de su autoridad y el Príncipe heredero es menor de edad, ¿quién ejerce inmediatamente la Regencia?",opts:["El Presidente del Gobierno","El padre o la madre del Príncipe heredero y, en su defecto, el pariente mayor de edad más próximo","El Presidente del Congreso","Una persona nombrada por sorteo entre las Cortes"],correct:1,note:"Título II CE: la Regencia recae en el padre/madre del heredero o, en su defecto, el pariente mayor de edad más próximo a suceder.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Entre qué límites de Diputados se compone el Congreso según la Constitución (Título III)?",opts:["Mínimo 350, máximo 400","Mínimo 300, máximo 350","Mínimo 300, máximo 400","Mínimo 200, máximo 300"],correct:2,note:"El Congreso se compone de un mínimo de 300 y un máximo de 400 Diputados (art. 68 CE).",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Cuántas firmas acreditadas exige como mínimo la iniciativa legislativa popular (art. 87.3 CE)?",opts:["100.000","300.000","500.000","1.000.000"],correct:2,note:"Art. 87.3 CE: no menos de 500.000 firmas acreditadas.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"Según la Ley 50/1997 del Gobierno, ¿quiénes componen estrictamente el Gobierno de la Nación?",opts:["El Presidente, los Vicepresidentes, los Ministros y los Secretarios de Estado","El Presidente, el/los Vicepresidente/s, en su caso, y los Ministros","El Presidente, los Ministros y los Directores Generales","Únicamente el Presidente y los Ministros con cartera"],correct:1,note:"El Gobierno lo componen el Presidente, los Vicepresidentes (si los hay) y los Ministros; los Secretarios de Estado no forman parte de él.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Cuántos días deben transcurrir como mínimo desde la presentación de una moción de censura hasta su votación (art. 113 CE)?",opts:["2 días","5 días","10 días","15 días"],correct:1,note:"Art. 113 CE: no puede ser votada hasta que transcurran 5 días desde su presentación.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Cuántos miembros tiene el Tribunal Constitucional y por cuánto tiempo se nombran (art. 159 CE)?",opts:["12 miembros, 9 años","15 miembros, 6 años","20 miembros, 5 años","9 miembros, 12 años"],correct:0,note:"12 miembros nombrados por 9 años, renovados por terceras partes cada 3 años.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Qué mayoría exige la reforma constitucional agravada del art. 168 CE (p. ej. reforma del Título Preliminar)?",opts:["Mayoría absoluta de cada Cámara","3/5 de cada Cámara","2/3 de cada Cámara, disolución de Cortes, ratificación por las nuevas Cámaras y referéndum obligatorio","Referéndum directo sin intervención de las Cortes"],correct:2,note:"Art. 168 CE: la reforma agravada exige 2/3 de cada Cámara, disolución de Cortes, nueva ratificación por 2/3 y referéndum obligatorio.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"Según la Ley 40/2015 (LRJSP), ¿qué órganos tienen la consideración de 'órgano directivo' en la organización central de la AGE?",opts:["El Ministro","El Secretario de Estado","El Subsecretario y el Secretario General","El Delegado del Gobierno"],correct:2,note:"El Subsecretario y el Secretario General tienen la consideración de órganos directivos (art. 55 LRJSP).",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Cuál de estas entidades NO forma parte del sector público institucional estatal según la Ley 40/2015?",opts:["Organismos autónomos","Sociedades mercantiles estatales","Consorcios y fundaciones del sector público","Las Cortes Generales"],correct:3,note:"Las Cortes Generales son un órgano constitucional, no una entidad del sector público institucional (art. 84 LRJSP).",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"España se incorporó a las Comunidades Europeas mediante el Tratado de Adhesión firmado el 12 de junio de 1985. ¿Desde cuándo produjo efectos?",opts:["1 de enero de 1986","12 de junio de 1985","1 de enero de 1992","1 de noviembre de 1993"],correct:0,note:"El Tratado de Adhesión, firmado en 1985, tuvo efectos desde el 1 de enero de 1986.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿En qué consiste el derecho originario de la Unión Europea?",opts:["Los reglamentos europeos","Los Tratados fundacionales","Las directivas europeas","Las decisiones de la Comisión"],correct:1,note:"El derecho originario está formado por los Tratados; reglamentos, directivas y decisiones son derecho derivado."},
+    {q:"Entre las normas de derecho derivado de la UE (art. 288 TFUE), ¿cuál es obligatoria en todos sus elementos y directamente aplicable sin necesidad de transposición?",opts:["La Directiva","El Reglamento","La Decisión","La Recomendación"],correct:1,note:"El Reglamento europeo es directamente aplicable en cada Estado miembro sin transposición.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+    {q:"¿Qué rango normativo tienen los Decretos-leyes y los Decretos Legislativos en el sistema de fuentes español?",opts:["Rango de ley","Rango reglamentario","Carácter meramente organizativo, sin rango legal","Rango supremo equivalente a la Constitución"],correct:0,note:"Ambos tienen rango de ley, pese a emanar del Gobierno.",fuente:"Bloque1_Constitucional_UE_Temas1-8.docx"},
+  ]
+},
+{
+  id:"b2", nombre:"Bloque 2", temas:"9-11", titulo:"Procedimiento Administrativo, Contratación y Transparencia",
+  docUrl:"https://drive.google.com/file/d/10svi6FGTAlXHpKdHw5848o1l0wS6CxYg/view",
+  teoria:[
+    {h:"Tema 9 (I) — Ley 39/2015 (LPACAP): interesados, plazos y silencio",p:"La LPACAP regula el procedimiento administrativo común (art. 1) y define interesado (art. 4) como quien promueve el procedimiento, quien tiene derechos afectados o quien ostenta intereses legítimos afectados. La Administración debe dictar resolución expresa (art. 21): el plazo máximo lo fija la norma reguladora sin exceder de 6 meses salvo ley, y si no se fija, rige el de 3 meses. El silencio en procedimientos a instancia de parte (art. 24) es estimatorio con carácter general, salvo excepción legal o afectación a dominio público, servicio público, medio ambiente o responsabilidad patrimonial (entonces desestimatorio). La subsanación de solicitudes (art. 68) se concede en 10 días, ampliable 5 más. El trámite de audiencia (art. 82) dura entre 10 y 15 días."},
+    {h:"Tema 9 (II) — Ley 39/2015: actos, notificaciones, recursos y revisión de oficio",p:"Son nulos de pleno derecho (art. 47, lista cerrada) los actos que lesionen derechos fundamentales, dictados por órgano manifiestamente incompetente, de contenido imposible o prescindiendo total y absolutamente del procedimiento; el resto de infracciones son anulables (art. 48). El recurso de alzada se interpone en 1 mes y se resuelve en 3 meses; el de reposición (potestativo) en 1 mes/1 mes; el extraordinario de revisión en 4 años (error de hecho) o 3 meses (documentos nuevos/falsedad). La declaración de lesividad de actos anulables favorables debe adoptarse en 4 años desde que se dictó el acto (art. 107)."},
+    {h:"Tema 9 (III) — Ley 40/2015 (LRJSP): competencia, sector público institucional y responsabilidad",p:"El art. 9.2 LRJSP excluye de la delegación las materias relativas a órganos constitucionales, disposiciones generales, resolución de recursos por el órgano que dictó el acto, y materias reservadas por ley. La prescripción de infracciones sin plazo específico en ley sectorial (art. 30) es de 3 años (muy graves), 2 años (graves) y 6 meses (leves). El sector público institucional estatal (art. 84) se clasifica en organismos públicos, autoridades administrativas independientes, sociedades mercantiles estatales, consorcios, fundaciones del sector público y fondos sin personalidad jurídica, sujetos a plan de actuación trienal y supervisión continua de la IGAE. Los convenios entre Administraciones (art. 49) no pueden superar 4 años de vigencia, prorrogables por acuerdo unánime hasta 4 años más."},
+    {h:"Tema 10 — Ley 9/2017 de Contratos del Sector Público (LCSP)",p:"Regula los contratos de obras, concesión de obras, concesión de servicios, suministro y servicios (arts. 13-17), adjudicados mediante procedimiento abierto, restringido, negociado o diálogo competitivo (art. 131). Los contratos menores (art. 118) tienen un valor estimado inferior a 40.000€ en obras o 15.000€ en suministros/servicios, y solo exigen informe motivado de necesidad. La garantía definitiva ordinaria (art. 107) es del 5% del precio de adjudicación (IVA excluido), ampliable hasta un 10% en total. Las modificaciones previstas en el pliego (art. 204) no pueden superar el 20% del precio inicial; las no previstas (art. 205), el 50%. El recurso especial en materia de contratación (art. 50) se interpone en 15 días hábiles."},
+    {h:"Tema 11 — Ley 19/2013 de Transparencia, acceso a la información y buen gobierno",p:"Establece obligaciones de publicidad activa (información institucional, organizativa, económica y presupuestaria, art. 6-8) y el derecho de acceso a la información pública para cualquier persona sin necesidad de motivar la solicitud (art. 12 y 17.3). Los límites al acceso (art. 14, lista cerrada) incluyen seguridad, defensa, intereses económicos y protección de datos, aplicados de forma justificada y proporcional. El plazo de resolución es de 1 mes, ampliable por otro (art. 20); transcurrido sin resolver, el silencio es desestimatorio. La reclamación potestativa ante el Consejo de Transparencia y Buen Gobierno (art. 24) se interpone en 1 mes y se resuelve en 3 meses."},
+  ],
+  quiz:[
+    {q:"Con carácter general, si la norma reguladora no fija otro plazo, ¿cuál es el plazo máximo para resolver y notificar un procedimiento (art. 21.3 Ley 39/2015)?",opts:["1 mes","3 meses","6 meses","1 año"],correct:1,note:"El plazo máximo general es de tres meses; el límite legal genérico (salvo norma con rango de ley) es de 6 meses.",fuente:"Bloque2_ProcedimientoContratacionTransparencia_Temas9-11.docx"},
+    {q:"¿Qué recurso administrativo se interpone ante el mismo órgano que dictó el acto?",opts:["Recurso de alzada","Recurso de reposición","Recurso contencioso-administrativo","Recurso de amparo"],correct:1,note:"El recurso de reposición es potestativo y se dirige al mismo órgano que dictó el acto (art. 123 Ley 39/2015)."},
+    {q:"¿Cuál es la regla general sobre el sentido del silencio administrativo en procedimientos iniciados a instancia de parte (art. 24 Ley 39/2015)?",opts:["Siempre desestimatorio","Siempre estimatorio sin excepciones","Estimatorio con carácter general, salvo excepciones legales (dominio público, servicio público, medio ambiente, responsabilidad patrimonial)","Depende exclusivamente del interesado"],correct:2,note:"El silencio es estimatorio con carácter general, salvo las excepciones que fije la ley."},
+    {q:"¿En qué plazo debe subsanarse una solicitud defectuosa tras el requerimiento de la Administración (art. 68 Ley 39/2015)?",opts:["10 días hábiles, ampliable 5 más","24 horas","1 mes natural","No cabe subsanación"],correct:0,note:"Plazo general de 10 días, ampliable prudencialmente 5 días más, con apercibimiento de desistimiento."},
+    {q:"¿Cuáles son las causas de nulidad de pleno derecho de un acto administrativo (art. 47 Ley 39/2015)?",opts:["Cualquier infracción del ordenamiento jurídico, sin excepción","Una lista cerrada: lesión de derechos fundamentales, órgano manifiestamente incompetente, contenido imposible, infracción penal, o prescindir total y absolutamente del procedimiento, entre otras","Solo los actos que no se hayan notificado en plazo","Solo los actos sancionadores"],correct:1,note:"El art. 47 establece una lista cerrada (numerus clausus) de causas de nulidad de pleno derecho; el resto de infracciones son anulables."},
+    {q:"Según la Ley 40/2015 (LRJSP), ¿qué materias NO pueden ser objeto de delegación de competencias (art. 9.2)?",opts:["Cualquier competencia puede delegarse sin límite","Asuntos relativos a órganos constitucionales, adopción de disposiciones generales, resolución de recursos por el órgano que dictó el acto, y materias reservadas por ley","Solo las competencias económicas","Solo las competencias en materia de personal"],correct:1,note:"El art. 9.2 LRJSP excluye expresamente estas materias de la delegación."},
+    {q:"¿Cuál es la vigencia máxima ordinaria de un convenio entre Administraciones Públicas según la Ley 40/2015 (art. 49)?",opts:["1 año","4 años, prorrogables por acuerdo unánime hasta 4 años más","10 años sin posibilidad de prórroga","Indefinida en todo caso"],correct:1,note:"Los convenios no pueden tener una vigencia superior a 4 años, salvo que se prevea otra distinta, prorrogable por acuerdo unánime hasta 4 años adicionales."},
+    {q:"¿Qué documento detalla el inventario técnico y las especificaciones del material a contratar?",opts:["El Pliego de Cláusulas Administrativas Particulares (PCAP)","El Pliego de Prescripciones Técnicas (PPT)","El informe de fiscalización previa","La memoria económica"],correct:1,note:"El PPT recoge las especificaciones técnicas del objeto del contrato."},
+    {q:"¿Cuál de estos NO es un procedimiento de adjudicación previsto en la Ley 9/2017?",opts:["Abierto","Restringido","Negociado","Referéndum"],correct:3,note:"Los procedimientos son abierto, restringido, negociado y diálogo competitivo, entre otros; el referéndum no es un procedimiento de contratación."},
+    {q:"¿Qué principio persigue la división de un contrato en lotes?",opts:["Aumentar el precio","Favorecer el acceso de las PYME","Reducir la publicidad del contrato","Evitar el control del Tribunal de Cuentas"],correct:1,note:"La división en lotes facilita la concurrencia de pequeñas y medianas empresas."},
+    {q:"¿Qué órgano resuelve las reclamaciones en materia de acceso a la información pública?",opts:["El Tribunal de Cuentas","El Consejo de Transparencia y Buen Gobierno","La Agencia Tributaria","El Defensor del Pueblo únicamente"],correct:1,note:"El Consejo de Transparencia y Buen Gobierno es el órgano competente."},
+    {q:"Según la Ley 9/2017, ¿qué se entiende por 'poder adjudicador' a efectos de la aplicación de la normativa de contratación?",opts:["Únicamente los Ministerios","El Estado, las CCAA, las Entidades Locales y los organismos y entidades vinculados o dependientes que cumplan determinados requisitos","Solo las empresas públicas cotizadas","Exclusivamente los ayuntamientos de más de 50.000 habitantes"],correct:1,note:"El concepto de poder adjudicador es amplio e incluye Administraciones territoriales y sus entidades vinculadas o dependientes que reúnan los requisitos legales.",fuente:"Bloque2_ContratacionTransparencia_Temas9-11.docx"},
+    {q:"¿Qué efecto produce la concurrencia de una causa de nulidad de pleno derecho en un contrato administrativo?",opts:["El contrato sigue vigente hasta su vencimiento natural","Da lugar, en general, a la apertura de un proceso de revisión y a la entrada en la fase de liquidación del contrato","Solo afecta a las cláusulas económicas","No tiene efectos si el contratista ya ha iniciado la ejecución"],correct:1,note:"La declaración de nulidad de pleno derecho lleva a la liquidación del contrato, con recíproca restitución de prestaciones cuando sea posible.",fuente:"Bloque2_ContratacionTransparencia_Temas9-11.docx"},
+    {q:"En los contratos sujetos a regulación armonizada, ¿qué umbral aproximado (en términos generales) determina esa sujeción según la normativa europea de contratación?",opts:["No existe ningún umbral, todos están armonizados","Un umbral económico fijado periódicamente por la Comisión Europea en función del tipo de contrato","Depende exclusivamente del número de licitadores","Solo aplica a contratos de obra pública"],correct:1,note:"La sujeción a regulación armonizada depende de umbrales económicos que la Comisión Europea revisa periódicamente por tipo de contrato.",fuente:"Bloque2_ContratacionTransparencia_Temas9-11.docx"},
+    {q:"¿Qué límites contempla la Ley 19/2013 para el ejercicio del derecho de acceso a la información pública?",opts:["Ninguno, el acceso es siempre absoluto","Límites relacionados con la seguridad, la protección de datos personales u otros intereses jurídicamente protegidos, aplicados de forma justificada y proporcionada","Solo puede limitarse por motivos económicos","Solo puede ejercerlo el Defensor del Pueblo"],correct:1,note:"El derecho de acceso puede limitarse cuando concurran los límites tasados en la ley (seguridad, protección de datos, etc.), aplicados de forma justificada y proporcional.",fuente:"Bloque2_ProcedimientoContratacionTransparencia_Temas9-11.docx"},
+    {q:"Según la Ley 9/2017, ¿a partir de qué importe deja un contrato de obras de considerarse 'menor' (art. 118)?",opts:["15.000 €","40.000 €","100.000 €","No existe umbral, todos son menores si no hay licitación"],correct:1,note:"Los contratos de obras son menores si su valor estimado es inferior a 40.000€; en suministros/servicios el umbral es 15.000€.",fuente:"Bloque2_ProcedimientoContratacionTransparencia_Temas9-11.docx"},
+    {q:"¿Cuál es el porcentaje ordinario de la garantía definitiva en un contrato del sector público (art. 107 LCSP)?",opts:["1% del precio de adjudicación","5% del precio de adjudicación (IVA excluido)","10% del precio de adjudicación siempre","25% del precio de adjudicación"],correct:1,note:"La garantía definitiva ordinaria es del 5% del precio de adjudicación (IVA excluido), ampliable hasta un 10% en total en casos especiales."},
+    {q:"¿En qué plazo debe resolverse una solicitud de acceso a la información pública (art. 20 Ley 19/2013)?",opts:["10 días hábiles","1 mes, ampliable por otro mes","6 meses","No hay plazo legal"],correct:1,note:"El plazo máximo de resolución es de 1 mes, ampliable por otro si el volumen o complejidad lo requiere; el silencio transcurrido ese plazo es desestimatorio."},
+  ]
+},
+{
+  id:"b3", nombre:"Bloque 3", temas:"12-15", titulo:"Función Pública y Recursos Humanos",
+  docUrl:"https://drive.google.com/file/d/1vffXQlFfMPkViPIa4NFRFWzaBgHQif34/view",
+  teoria:[
+    {h:"Tema 12 (I) — EBEP: clases de personal, acceso y situaciones administrativas",p:"El TREBEP (RDL 5/2015) clasifica a los empleados públicos en 4 categorías cerradas (art. 8): funcionarios de carrera, funcionarios interinos, personal laboral (fijo, indefinido o temporal) y personal eventual. Los interinos por vacante (art. 10) tienen un límite máximo de 3 años; el personal eventual (art. 12) desempeña funciones de confianza o asesoramiento especial, con nombramiento y cese libres, sin que su condición constituya mérito para el acceso. El acceso al empleo público (art. 56) exige nacionalidad española (salvo excepciones), capacidad funcional, 16 años cumplidos y la titulación exigida, mediante oposición o concurso-oposición (art. 61). Las situaciones administrativas (art. 85, catálogo cerrado de 5) son: servicio activo, servicios especiales, servicio en otras AAPP, excedencia y suspensión de funciones; la excedencia voluntaria por interés particular exige 5 años de servicios previos."},
+    {h:"Tema 12 (II) — EBEP: permisos, vacaciones y régimen disciplinario",p:"Las vacaciones anuales (art. 50) son de 22 días hábiles. Entre los permisos (art. 48): asuntos particulares 6 días/año, matrimonio 15 días, lactancia de hijo menor de 12 meses 1 hora diaria fraccionable. Las faltas disciplinarias se clasifican en muy graves, graves y leves (art. 95); las sanciones van desde el apercibimiento hasta la separación del servicio, con suspensión firme de hasta 6 años. La prescripción de faltas (art. 97) es de 3 años (muy graves), 2 años (graves) y 6 meses (leves), igual que las sanciones."},
+    {h:"Tema 12 (III) — Ley 53/1984 de Incompatibilidades y IV Convenio Único AGE",p:"El principio rector (art. 1º) es la dedicación a un solo puesto público, salvo excepciones tasadas (docencia, sanidad, interés público por RD del Consejo de Ministros). Las actividades privadas incompatibles en todo caso (art. 12) incluyen pertenecer a consejos de administración de empresas relacionadas con el departamento o participar en más del 10% del capital de empresas contratistas. No cabe compatibilidad si el complemento específico supera el 30% de la retribución básica (art. 16). El IV Convenio Único del personal laboral de la AGE clasifica al personal en 6 grupos profesionales (M3 a E0) y regula un régimen disciplinario propio: faltas muy graves incluyen la falta de asistencia injustificada de 5 o más días al mes, con sanciones que incluyen el despido disciplinario y el traslado forzoso."},
+    {h:"Tema 13 — Procesos selectivos: Orden HFP/688/2017 y RD 364/1995",p:"El plazo de presentación de solicitudes en procesos selectivos de la AGE es de 20 días hábiles desde la publicación en el BOE (Orden HFP/688/2017); el RD 364/1995 (norma general de ingreso) fija 20 días naturales para otros procesos — una diferencia relevante entre ambas normas. Los tribunales calificadores no pueden estar formados mayoritariamente por funcionarios del mismo Cuerpo, deben tender a la paridad de sexos y excluyen a personal de elección política, interino o eventual. En los concursos de méritos (art. 44 RD 364/1995), cada concepto puntuable no puede superar el 40% ni ser inferior al 10% de la puntuación máxima total. La libre designación (arts. 51-58) se reserva a puestos de Subdirector General y directivos; el nombramiento debe producirse en 1 mes, prorrogable a 2."},
+    {h:"Tema 14 — Estatuto de los Trabajadores, órganos de representación y libertad sindical",p:"El periodo de prueba (art. 14 ET) no puede exceder de 6 meses para técnicos titulados ni de 2 meses para el resto. El despido declarado improcedente (art. 56) da opción entre readmisión o indemnización de 33 días de salario por año (máximo 24 mensualidades). La Ley 9/1987 de Órganos de Representación está derogada por el EBEP salvo su art. 7 y, transitoriamente, otros preceptos sobre Juntas de Personal (escala de representantes según censo, mandato de 4 años). La LO 11/1985 de Libertad Sindical considera más representativo a nivel estatal al sindicato que obtiene el 10% o más de representantes; a nivel autonómico, el 15% con mínimo de 1.500 representantes."},
+    {h:"Tema 15 — El derecho de huelga (RDL 17/1977)",p:"La declaración de huelga exige acuerdo de los representantes de los trabajadores con asistencia de al menos el 75% de ellos, o votación directa si lo solicita el 25% de la plantilla. El preaviso general es de 5 días naturales, elevado a 10 días naturales si afecta a servicios públicos. El comité de huelga tiene un máximo de 12 personas. El contrato de trabajo queda suspendido durante la huelga, sin derecho a salario, permaneciendo el trabajador en alta especial en la Seguridad Social. El cierre patronal solo cabe por riesgo de violencia, ocupación ilegal del centro o inasistencias que impidan gravemente la producción, y debe comunicarse a la autoridad laboral en 12 horas."},
+  ],
+  quiz:[
+    {q:"¿Cuáles son los principios que rigen el acceso al empleo público según el EBEP?",opts:["Antigüedad, confianza, discrecionalidad y rapidez","Igualdad, mérito, capacidad y publicidad","Sorteo, rotación, gratuidad y flexibilidad","Jerarquía, eficacia, coordinación y desconcentración"],correct:1,note:"El acceso al empleo público se rige por igualdad, mérito, capacidad y publicidad."},
+    {q:"¿Cuál de las siguientes NO es una clase de personal reconocida por el EBEP?",opts:["Funcionario de carrera","Personal eventual","Personal laboral","Personal vitalicio"],correct:3,note:"El EBEP reconoce funcionarios de carrera, interinos, personal laboral y personal eventual; no existe la categoría de 'personal vitalicio'."},
+    {q:"¿Qué situación administrativa implica el pase temporal fuera del servicio activo por motivos personales?",opts:["Servicio activo","Excedencia","Servicios especiales","Suspensión firme"],correct:1,note:"La excedencia es la situación que permite alejarse temporalmente del servicio activo; la voluntaria por interés particular exige 5 años de servicios previos."},
+    {q:"¿Cuál es el límite temporal máximo, con carácter general, del nombramiento de un funcionario interino por vacante (art. 10 EBEP)?",opts:["1 año","3 años","5 años","Sin límite hasta cubrirse la plaza"],correct:1,note:"El nombramiento de interino por vacante tiene un límite máximo de 3 años, salvo que exista convocatoria ya publicada.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"¿Cómo define el EBEP al personal eventual?",opts:["El que ocupa plaza en la plantilla mediante oposición libre","El que, en virtud de nombramiento y con carácter no permanente, ocupa un puesto de confianza o asesoramiento especial","El personal laboral fijo con más de 10 años de antigüedad","Los altos cargos del Gobierno"],correct:1,note:"El personal eventual desempeña funciones de confianza o asesoramiento especial, con nombramiento y cese libres y carácter no permanente.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"¿Cuántos días hábiles de vacaciones anuales corresponden, con carácter general, a un funcionario de carrera (art. 50 EBEP)?",opts:["20 días hábiles","22 días hábiles","30 días naturales","25 días hábiles"],correct:1,note:"El art. 50 EBEP fija 22 días hábiles de vacaciones anuales.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"Según la Ley 53/1984, ¿qué límite de participación en el capital de una empresa contratista del sector público hace incompatible la actividad privada en todo caso?",opts:["Más del 5%","Más del 10%","Más del 25%","Más del 50%"],correct:1,note:"El art. 12 de la Ley 53/1984 declara incompatible la participación superior al 10% del capital en empresas contratistas o concesionarias relacionadas con el departamento.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"¿Cuál es el plazo de presentación de solicitudes en los procesos selectivos de la AGE según la Orden HFP/688/2017?",opts:["10 días hábiles","20 días hábiles","20 días naturales","1 mes natural"],correct:1,note:"20 días hábiles desde la publicación de la convocatoria en el BOE (frente a los 20 días naturales del RD 364/1995, norma general anterior).",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"En los concursos de méritos del RD 364/1995 (art. 44), ¿qué límites tiene la puntuación de cada concepto valorable?",opts:["No puede superar el 40% ni ser inferior al 10% de la puntuación máxima total","Debe ser siempre exactamente el 25%","No hay límites, lo fija libremente el tribunal","Máximo 100 puntos por concepto"],correct:0,note:"Cada concepto puntuable no puede exceder del 40% ni ser inferior al 10% de la puntuación máxima total.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"Según el Estatuto de los Trabajadores, ¿qué indemnización corresponde por despido declarado improcedente (art. 56 ET)?",opts:["12 días de salario por año","20 días de salario por año","33 días de salario por año, máximo 24 mensualidades","45 días de salario por año sin límite"],correct:2,note:"El despido improcedente da derecho, con carácter general, a una indemnización de 33 días por año trabajado con un máximo de 24 mensualidades.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"¿Qué porcentaje de representantes en el ámbito estatal convierte a un sindicato en 'más representativo' según la LO 11/1985?",opts:["5%","10%","15%","25%"],correct:1,note:"Un sindicato es más representativo a nivel estatal si obtiene el 10% o más de los delegados/representantes en dicho ámbito.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"Según el RDL 17/1977, ¿cuál es el preaviso mínimo para declarar una huelga que afecte a servicios públicos?",opts:["5 días naturales","10 días naturales","15 días naturales","No se exige preaviso en servicios públicos"],correct:1,note:"El preaviso general es de 5 días naturales, elevado a 10 días naturales cuando la huelga afecta a servicios públicos.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+    {q:"¿Cuál es la composición máxima del comité de huelga según el RDL 17/1977?",opts:["6 personas","12 personas","20 personas","Sin límite legal"],correct:1,note:"El comité de huelga solo puede componerse de trabajadores del propio centro afectado, con un máximo de 12 personas.",fuente:"Bloque3_FuncionPublicaRRHH_Temas12-15.docx"},
+  ]
+},
+{
+  id:"b4", nombre:"Bloque 4", temas:"16-19", titulo:"Presupuesto, PRL, Igualdad y estructura del CSD",
+  docUrl:"https://drive.google.com/file/d/1jXld8dgmaI255RVj8UvOIYSH5RCfTLsj/view",
+  teoria:[
+    {h:"Tema 16 (I) — Ley 47/2003 General Presupuestaria: sector público y elaboración de los PGE",p:"La LGP regula el régimen presupuestario del sector público estatal (AGE + sector público institucional: organismos autónomos, EPE, agencias estatales, sociedades mercantiles estatales, consorcios y fundaciones adscritos, entre otros). El ejercicio coincide con el año natural (art. 34). El proyecto de Ley de PGE debe remitirse a las Cortes Generales antes del 1 de octubre del año anterior (art. 37), con documentación complementaria (informe de impacto de género, de infancia, de alineamiento con la Agenda 2030). Si la Ley de PGE no se aprueba antes del inicio del ejercicio, se prorrogan automáticamente los presupuestos del ejercicio anterior (art. 38, prórroga automática) sin alterar la cuantía total."},
+    {h:"Tema 16 (II) — Estructura, modificaciones de crédito y control",p:"Los gastos se clasifican simultáneamente por criterio orgánico, por programas y económico (art. 39-41). Las modificaciones de crédito (art. 51) son de 5 tipos: transferencias, generaciones, ampliaciones, créditos extraordinarios/suplementos e incorporaciones; en organismos autónomos, el Presidente puede aprobar hasta el 10% del capítulo (máx. 500.000€), el Ministro de Hacienda hasta el 20% (máx. 1.000.000€), y el resto corresponde al Consejo de Ministros (art. 56). El control externo corresponde al Tribunal de Cuentas; el control interno, con plena autonomía, a la IGAE (art. 140), mediante función interventora, control financiero permanente y auditoría pública (art. 142). En responsabilidad patrimonial contable (arts. 176-182), el dolo genera responsabilidad solidaria y la culpa grave, mancomunada."},
+    {h:"Tema 17 — Ley 31/1995 de Prevención de Riesgos Laborales y RD 67/2010 (adaptación a la AGE)",p:"El art. 14 LPRL reconoce el derecho de los trabajadores a una protección eficaz, correlativo al deber empresarial de protección, con coste íntegro a cargo del empresario. El art. 15 enumera 9 principios de la acción preventiva (evitar riesgos, evaluarlos, combatirlos en origen, adaptar el trabajo a la persona, etc.). El empresario puede asumir personalmente la prevención en empresas de hasta 10 trabajadores (25 en un único centro). La escala de Delegados de Prevención (art. 35) va de 2 (50-100 trabajadores) a 8 (más de 4.001); el Comité de Seguridad y Salud es obligatorio en centros de 50 o más trabajadores (art. 38), reunido trimestralmente. El RD 67/2010 adapta la LPRL a la AGE, excluyendo policía/seguridad/FF.AA., y crea la Comisión Técnica de PRL dependiente de la Mesa General de Negociación."},
+    {h:"Tema 18 — LO 3/2007 para la igualdad efectiva de mujeres y hombres",p:"El art. 3 define el principio de igualdad de trato como ausencia de discriminación directa o indirecta por razón de sexo. El art. 6 distingue discriminación directa (trato menos favorable) e indirecta (disposición neutra que perjudica a un sexo). El art. 7 tipifica el acoso sexual y el acoso por razón de sexo como discriminatorios en todo caso. Desde el RDL 6/2019, las empresas de 50 o más trabajadores deben elaborar y negociar un plan de igualdad (arts. 45-46), con diagnóstico previo en 9 materias y Registro de Planes de Igualdad obligatorio. Se crean la Comisión Interministerial de Igualdad (art. 76), las Unidades de Igualdad ministeriales (art. 77) y el Consejo de Participación de la Mujer (art. 78). La normativa LGTBI específica y más reciente aplicable al deporte (Ley 4/2023) se desarrolla en el Bloque 10."},
+    {h:"Tema 19 (I) — Estatuto del CSD (RD 460/2015): naturaleza y órganos",p:"El CSD es un organismo autónomo (art. 43.1.a LOFAGE) adscrito al ministerio competente en deporte, que ejerce las competencias estatales en la materia (art. 1 del Estatuto). Distingue órganos rectores (Presidencia y Comisión Directiva) y de gestión (Dirección General de Deportes). La Presidencia, con rango de Secretario de Estado, es nombrada por el Consejo de Ministros; entre sus funciones están conceder subvenciones, autorizar competiciones internacionales en España y presidir la Asamblea General del Deporte. La Comisión Directiva (cuyos actos agotan la vía administrativa) se compone de Presidente, Vicepresidente, vocales de AGE/CCAA/EELL/federaciones/prestigio, y Secretario; el mandato de los vocales (salvo AGE) es de 4 años, con reuniones al menos trimestrales."},
+    {h:"Tema 19 (II) — Marco introductorio de la Ley 39/2022 del Deporte",p:"La Ley 39/2022 deroga la Ley 10/1990 y fija en su Título Preliminar el derecho a la práctica deportiva como actividad esencial (art. 2) y fines vinculados a salud, cohesión social, igualdad, discapacidad, menores y sostenibilidad (arts. 3-10). Su desarrollo íntegro (federaciones, ligas, régimen sancionador, TAD) corresponde a los Bloques 5 y 5b de este temario. También es relevante aquí la Carta Europea del Deporte del Consejo de Europa (recomendación no vinculante sobre acceso al deporte y ética deportiva, ver Bloque 10)."},
+  ],
+  quiz:[
+    {q:"¿Qué ley regula los principios y el ciclo del Presupuesto General del Estado?",opts:["Ley 9/2017","Ley 47/2003 General Presupuestaria","Ley 39/2015","Ley 19/2013"],correct:1,note:"Ley 47/2003 General Presupuestaria."},
+    {q:"¿Antes de qué fecha debe remitirse el proyecto de Ley de PGE a las Cortes Generales (art. 37 LGP)?",opts:["1 de enero","1 de julio","1 de octubre del año anterior","31 de diciembre"],correct:2,note:"El proyecto debe remitirse antes del 1 de octubre del año anterior al de vigencia de los presupuestos.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"Si la Ley de PGE no se aprueba antes del inicio del ejercicio, ¿qué ocurre según el art. 38 LGP?",opts:["El Estado queda sin presupuesto hasta su aprobación","Se prorrogan automáticamente los presupuestos del ejercicio anterior","Rige directamente el proyecto no aprobado","Decide el Tribunal de Cuentas"],correct:1,note:"Se produce la prórroga automática de los presupuestos iniciales del ejercicio anterior, sin alterar la cuantía total.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"¿Qué órgano ejerce el control interno del sector público estatal, con plena autonomía respecto de las entidades controladas?",opts:["El Tribunal de Cuentas","La Intervención General de la Administración del Estado (IGAE)","El Consejo de Ministros","La Agencia Tributaria"],correct:1,note:"La IGAE ejerce el control interno (función interventora, control financiero permanente y auditoría pública); el Tribunal de Cuentas ejerce el control externo.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"¿Qué debe hacer el empresario antes de exponer a los trabajadores a un riesgo laboral, según la Ley 31/1995?",opts:["Nada, no es obligatorio","Evaluar los riesgos y planificar la prevención","Esperar a que ocurra un accidente","Delegarlo íntegramente en el trabajador"],correct:1,note:"La evaluación de riesgos y la planificación preventiva son obligaciones previas del empresario, sin coste para el trabajador."},
+    {q:"¿Hasta qué tamaño de empresa puede el propio empresario asumir personalmente la actividad preventiva (art. 30.5 LPRL)?",opts:["Hasta 6 trabajadores","Hasta 10 trabajadores (25 si hay un único centro de trabajo)","Hasta 50 trabajadores","No puede asumirla nunca personalmente"],correct:1,note:"El empresario puede asumir la prevención en empresas de hasta 10 trabajadores, o 25 si hay un único centro y desarrolla allí su actividad habitual.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"¿A partir de qué tamaño de plantilla es obligatorio constituir un Comité de Seguridad y Salud (art. 38 LPRL)?",opts:["10 o más trabajadores","25 o más trabajadores","50 o más trabajadores","100 o más trabajadores"],correct:2,note:"El Comité de Seguridad y Salud es obligatorio en empresas o centros de 50 o más trabajadores, con reunión trimestral.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"Según la LO 3/2007, ¿qué diferencia hay entre discriminación directa e indirecta?",opts:["No hay diferencia, son sinónimos","La directa es un trato menos favorable explícito por razón de sexo; la indirecta es una disposición aparentemente neutra que perjudica a un sexo sin justificación objetiva","La indirecta solo se aplica en el ámbito educativo","La directa solo puede cometerla la Administración"],correct:1,note:"Art. 6 LO 3/2007: distingue discriminación directa (trato menos favorable) de indirecta (norma neutra con efecto perjudicial no justificado).",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"Desde el RDL 6/2019, ¿a partir de qué tamaño de empresa es obligatorio un plan de igualdad (arts. 45-46 LO 3/2007)?",opts:["25 o más trabajadores","50 o más trabajadores","250 o más trabajadores","No es obligatorio en ningún caso"],correct:1,note:"El umbral se rebajó a 50 o más trabajadores (antes 250), con calendario transitorio según tamaño de empresa.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"¿Qué tipo de organismo es el Consejo Superior de Deportes (CSD)?",opts:["Una federación deportiva","Un organismo autónomo estatal","Una sociedad mercantil privada","Una fundación sin ánimo de lucro"],correct:1,note:"El CSD es un organismo autónomo (art. 43.1.a LOFAGE) adscrito al departamento ministerial competente en deporte, según su Estatuto (RD 460/2015)."},
+    {q:"¿Qué rango tiene la Presidencia del CSD y quién la nombra?",opts:["Rango de Director General, nombrado por el Ministro","Rango de Secretario de Estado, nombrado por el Consejo de Ministros","Rango de Subsecretario, nombrado por el Rey","No tiene rango asimilado"],correct:1,note:"La Presidencia del CSD tiene rango de Secretario de Estado y es nombrada y separada por el Consejo de Ministros (art. 5 del Estatuto, RD 460/2015).",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+    {q:"¿Cuál es el mandato de los vocales de la Comisión Directiva del CSD (salvo los de la AGE)?",opts:["2 años","4 años","6 años","Indefinido"],correct:1,note:"El mandato de los vocales de la Comisión Directiva (salvo los representantes de la AGE) es de 4 años.",fuente:"Bloque4_PresupuestoPRLIgualdadCSD_Temas16-19.docx"},
+  ]
+},
+{
+  id:"b5", nombre:"Bloque 5", temas:"9, 17, 18", titulo:"Ley 39/2022 del Deporte — Entidades deportivas, régimen sancionador y TAD",
+  docUrl:"https://drive.google.com/file/d/1CVNXKZWCLi0Y_v4M5_lt5gtFqJ4U9ONY/view",
+  teoria:[
+    {h:"Tema 9 (I) — Federaciones deportivas españolas: naturaleza y estructura (Título III)",p:"Las federaciones son entidades privadas de naturaleza asociativa, sin ánimo de lucro, con personalidad jurídica propia, que ejercen además funciones públicas de carácter administrativo por delegación (art. 43). Deben integrar en sus órganos a deportistas, clubes, técnicos, jueces/árbitros y federaciones autonómicas; la liga profesional correspondiente se integra necesariamente en la federación. El Registro Estatal de Entidades Deportivas (art. 40), en el CSD, produce reconocimiento oficial y reserva de denominación. Los estatutos federativos, ratificados por el CSD, entran en vigor tras su publicación en el BOE (art. 45). Cada modalidad deportiva solo puede reconocerse a una única federación estatal (art. 44.3)."},
+    {h:"Tema 9 (II) — Licencia deportiva, funciones federativas y ligas profesionales",p:"La licencia deportiva (art. 49) es necesaria para competir en competiciones oficiales estatales/internacionales, expedida por la federación española, con resolución en 15 días hábiles (silencio negativo injustificado). Entre las funciones bajo tutela del CSD (art. 50): calificar competiciones oficiales estatales, expedir licencias y ejercer potestad disciplinaria. Las ligas profesionales (art. 56) se constituyen dentro de las federaciones con competición profesional estatal, con personalidad jurídica y autonomía organizativa propia; sus estatutos requieren ratificación del CSD. El Código de Buen Gobierno es de adopción obligatoria (art. 60), con informe anual remitido al CSD."},
+    {h:"Tema 9 (III) — Sociedades Anónimas Deportivas y Comités Olímpico/Paralímpico (Título IV)",p:"Las entidades en competición profesional pueden adoptar forma de SAD (art. 69), con capital mínimo reglamentario y consejo de administración que incluye al menos un consejero independiente elegido democráticamente por abonados/socios minoritarios (art. 71). En la enajenación de instalaciones de una SAD existen derechos de tanteo y retracto preferentes: primero el Ayuntamiento, luego la CCAA, subsidiariamente el CSD (art. 73). El Comité Olímpico Español (art. 75) y el Comité Paralímpico Español (art. 76) son asociaciones sin fines de lucro, de utilidad pública, con representación exclusiva del deporte olímpico/paralímpico español ante el COI/IPC respectivamente; el emblema de los cinco anillos está reservado al COE."},
+    {h:"Tema 17 — Régimen sancionador general del deporte (Título VII)",p:"Se distingue el régimen sancionador (ejercido por la AGE) del régimen disciplinario federativo (arts. 97). Las infracciones se clasifican en muy graves, graves y leves (arts. 104-106): son muy graves, entre otras, predeterminar resultados mediante precio o intimidación, la manipulación de material que afecte al resultado, o el incumplimiento de composición equilibrada. Las sanciones muy graves (art. 108) incluyen multa de 3.000,01€ a 30.000€, pérdida de puntos, descenso de categoría o inhabilitación de 2 a 15 años. La prescripción de infracciones (art. 112) es de 3 años (muy graves), 2 años (graves) y 6 meses (leves). El procedimiento sancionador debe resolverse y notificarse en máximo 6 meses desde su inicio (art. 100)."},
+    {h:"Tema 18 — El Tribunal Administrativo del Deporte (Título VIII)",p:"El TAD (art. 120) es un órgano colegiado estatal con independencia funcional de la AGE. Sus funciones incluyen: decidir en última instancia administrativa cuestiones sancionadoras de su competencia, tramitar expedientes a instancia del CSD y conocer recursos contra sanciones de privación/revocación/suspensión definitiva de licencia, y velar por la conformidad a derecho de los procesos electorales federativos. Sus miembros son designados por el CSD con criterios de objetividad, igualdad, mérito, capacidad y publicidad. Sus resoluciones agotan la vía administrativa y son recurribles ante los Juzgados Centrales de lo Contencioso-Administrativo. La Red de Centros de Alto Rendimiento y de Tecnificación Deportiva (Título IX, art. 122) se coordina entre el CSD, las CCAA y las federaciones."},
+  ],
+  quiz:[
+    {q:"¿Qué naturaleza jurídica tienen las federaciones deportivas españolas conforme a la Ley 39/2022 (art. 43)?",opts:["Son órganos de la Administración General del Estado","Son entidades privadas de naturaleza asociativa, sin ánimo de lucro, que además ejercen funciones públicas de carácter administrativo por delegación","Son sociedades mercantiles estatales","Son organismos autónomos"],correct:1,note:"Las federaciones son entidades privadas de base asociativa que ejercen, por delegación, funciones públicas de carácter administrativo.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Cuántas federaciones deportivas españolas puede reconocerse por cada modalidad deportiva estatal (art. 44.3)?",opts:["Solo una","Hasta tres, según implantación territorial","Depende del número de licencias","No hay límite"],correct:0,note:"Una modalidad deportiva estatal solo puede reconocerse a una única federación española.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿En qué plazo debe resolverse la solicitud de licencia deportiva, con silencio negativo si no se resuelve (art. 49)?",opts:["10 días hábiles","15 días hábiles","1 mes","3 meses"],correct:1,note:"La federación debe resolver en 15 días hábiles; el silencio transcurrido ese plazo se considera negativo si no está justificado.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"En la enajenación de instalaciones deportivas de una SAD, ¿en qué orden se ejercen los derechos de tanteo y retracto (art. 73)?",opts:["Solo el Estado tiene preferencia","Primero el Ayuntamiento, luego la CCAA, subsidiariamente el CSD","Primero el CSD, luego el Ayuntamiento","Solo la propia liga profesional"],correct:1,note:"El orden de preferencia es Ayuntamiento, después Comunidad Autónoma, y subsidiariamente el CSD.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Qué entidad representa en exclusiva a España ante el Comité Olímpico Internacional (art. 75)?",opts:["El Consejo Superior de Deportes","El Comité Olímpico Español (COE)","Cualquier federación olímpica","El Tribunal Administrativo del Deporte"],correct:1,note:"El COE tiene la representación exclusiva del deporte olímpico español ante el COI.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Cuál es el plazo máximo para resolver y notificar un procedimiento sancionador general del deporte (art. 100)?",opts:["1 mes","3 meses","6 meses desde el acuerdo de iniciación","1 año"],correct:2,note:"La resolución expresa y su notificación deben producirse en el plazo máximo de 6 meses desde el acuerdo de iniciación.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"Según el art. 112 de la Ley 39/2022, ¿cuál es el plazo de prescripción de las infracciones muy graves del régimen sancionador del deporte?",opts:["1 año","2 años","3 años","5 años"],correct:2,note:"Las infracciones muy graves prescriben a los 3 años; las graves a los 2 años; las leves a los 6 meses.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Qué es el Tribunal Administrativo del Deporte (TAD)?",opts:["Un órgano jurisdiccional del orden penal","Un órgano colegiado estatal con independencia funcional de la AGE, competente en última instancia administrativa en materia sancionadora y disciplinaria deportiva","Una federación deportiva internacional","Un servicio médico del CSD"],correct:1,note:"El TAD es el órgano administrativo especializado del deporte estatal, con independencia funcional, competente en disciplina y electoral federativo.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Ante qué órgano jurisdiccional son recurribles las resoluciones del TAD (art. 120.4)?",opts:["El Tribunal Supremo directamente","Los Juzgados Centrales de lo Contencioso-Administrativo","Los Juzgados de lo Social","El Tribunal Constitucional"],correct:1,note:"Las resoluciones del TAD agotan la vía administrativa y son recurribles ante los Juzgados Centrales de lo Contencioso-Administrativo.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+    {q:"¿Qué instrumento de gobernanza es de adopción obligatoria para federaciones y ligas profesionales según el art. 60?",opts:["Un Código de Buen Gobierno, con informe anual remitido al CSD","Un plan de marketing anual","Un convenio colectivo sectorial","Ninguno, es voluntario"],correct:0,note:"El Código de Buen Gobierno es obligatorio, con un informe anual aprobado por la asamblea y remitido al CSD.",fuente:"Bloque5_DEFINITIVO_Ley39_2022_Completa.docx"},
+  ]
+},
+{
+  id:"b5b", nombre:"Bloque 5b", temas:"10-12", titulo:"Ley del Deporte — Título V (Competiciones, deporte universitario y escolar)",
+  docUrl:"https://drive.google.com/file/d/1M5dR2gK1BjZwYlGW3hz_g5f7q2Wda3Xu/view",
+  teoria:[
+    {h:"Organización de las competiciones oficiales",p:"La Ley 39/2022 del Deporte regula la organización de las competiciones deportivas oficiales de ámbito estatal, atribuyendo a las federaciones deportivas españolas la potestad de organizarlas y calificarlas. Se regula la licencia deportiva única, válida para todo el territorio nacional, que habilita para la participación en competiciones oficiales."},
+    {h:"Disciplina deportiva",p:"El régimen disciplinario deportivo sanciona las infracciones a las reglas del juego y a la conducta deportiva, distinguiéndose entre disciplina federativa (aplicada por las federaciones) y disciplina general del Estado (a través del Comité Español de Disciplina Deportiva)."},
+    {h:"Tema 10 — Clasificación de las competiciones y competiciones profesionales (arts. 78-85)",p:"Las competiciones se clasifican por naturaleza (oficiales/no oficiales), ámbito territorial (internacionales/estatales/supra-autonómicas) y naturaleza de participantes (profesionales/aficionadas), art. 78. La calificación de competición profesional (art. 83) exige valorar 6 criterios: volumen/importancia socioeconómica, capacidad de explotación comercial, existencia de vínculos laborales generalizados, convenios colectivos, tradición/implantación y proyección a futuro; solo las ligas profesionales pueden organizar competiciones profesionales, y por cada sexo solo puede existir una única competición profesional por modalidad (salvo categoría mixta prevista)."},
+    {h:"Tema 11-12 — Deporte universitario y deporte en edad escolar (arts. 88-90)",p:"Corresponde a las Universidades el fomento y participación de su comunidad en la actividad física (art. 88); a las CCAA, delimitar el marco de esa actividad; y a la AGE, organizar la fase final de las competiciones universitarias de ámbito superior a una CCAA con relevancia internacional. En el deporte en edad escolar (art. 89), corresponde a las CCAA el fomento y marco de la actividad, y a la AGE la fase final de competiciones de ámbito superior. El CSD promueve políticas de fomento de la actividad física en edad infantil y adolescente, incluyendo menores con discapacidad (art. 90)."},
+  ],
+  quiz:[
+    {q:"¿Qué habilita la licencia deportiva única?",opts:["Solo competir en la comunidad autónoma de residencia","Participar en competiciones oficiales en todo el territorio nacional","Ejercer como entrenador federativo","Acceder a subvenciones de mecenazgo"],correct:1,note:"La licencia única tiene validez en todo el territorio nacional."},
+    {q:"¿Qué órgano conoce la disciplina deportiva a nivel estatal, más allá de las federaciones?",opts:["El Comité Español de Disciplina Deportiva","El Tribunal de Cuentas","La Agencia Española de Protección de Datos","El Consejo de Transparencia"],correct:0,note:"El Comité Español de Disciplina Deportiva es el órgano estatal en esta materia."},
+    {q:"Según la Ley 39/2022 del Deporte, ¿a quién corresponde la potestad de organizar y calificar como oficiales las competiciones deportivas de ámbito estatal?",opts:["Al Consejo Superior de Deportes en todo caso","A las federaciones deportivas españolas","A las Comunidades Autónomas","A los clubes profesionales directamente"],correct:1,note:"Las federaciones deportivas españolas tienen atribuida la potestad de organizar y calificar las competiciones oficiales de carácter estatal.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué es el Tribunal Administrativo del Deporte (TAD)?",opts:["Un órgano jurisdiccional del orden penal","Un órgano de resolución extrajudicial de conflictos deportivos, adscrito al CSD, con competencias en materia disciplinaria y de disciplina deportiva, entre otras","Una federación deportiva internacional","Un servicio médico del CSD"],correct:1,note:"El TAD es el órgano administrativo especializado del deporte estatal, competente entre otras materias en disciplina deportiva y electoral federativa.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué régimen sancionador se aplica a las infracciones de las reglas del juego cometidas por deportistas durante la competición?",opts:["El régimen disciplinario deportivo, aplicado inicialmente por los propios jueces/árbitros y órganos federativos","El Código Penal directamente","El régimen disciplinario de la función pública","Ninguno, no son sancionables"],correct:0,note:"Las infracciones a las reglas del juego se sancionan por la disciplina deportiva, primero a través de jueces/árbitros y órganos disciplinarios federativos.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué requisito exige con carácter general la Ley 39/2022 para que una federación deportiva española pueda constituirse como tal?",opts:["Contar con un mínimo de deportistas de élite","Su reconocimiento y la inscripción en el Registro de Asociaciones Deportivas, tras la aprobación de sus estatutos por el CSD","Ser sociedad anónima deportiva","No existe ningún requisito formal"],correct:1,note:"Las federaciones deportivas españolas adquieren personalidad jurídica y capacidad de obrar tras su reconocimiento e inscripción en el Registro de Asociaciones Deportivas.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué naturaleza jurídica tienen las federaciones deportivas españolas conforme a la Ley del Deporte?",opts:["Son órganos de la Administración General del Estado","Son entidades privadas, de utilidad pública, que además ejercen funciones públicas de carácter administrativo por delegación","Son sociedades mercantiles estatales","Son organismos autónomos"],correct:1,note:"Las federaciones son entidades privadas de base asociativa y utilidad pública que ejercen, por delegación, funciones públicas de carácter administrativo.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué principio rige la relación entre las federaciones deportivas españolas y las federaciones deportivas autonómicas en materia de competiciones estatales?",opts:["Independencia total entre ambas","Coordinación e integración, correspondiendo a las federaciones españolas la estructura para las competiciones oficiales de ámbito estatal","Subordinación de la federación española a cada autonómica","No existe relación alguna"],correct:1,note:"Las federaciones autonómicas se integran en las españolas para la participación en competiciones oficiales de ámbito estatal, bajo un principio de coordinación.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+    {q:"¿Qué es una infracción muy grave típica en el régimen disciplinario deportivo estatal?",opts:["Llegar tarde a un entrenamiento","La manipulación de resultados o el fraude en la competición","Vestir una equipación no oficial","Cambiar de club una vez por temporada"],correct:1,note:"La manipulación de resultados/amaño de competiciones se tipifica como infracción muy grave en el régimen disciplinario deportivo.",fuente:"Bloque5b_LeyDeporte_Competiciones.docx"},
+  ]
+},
+{
+  id:"b6", nombre:"Bloque 6", temas:"30-45", titulo:"Ciencias del Deporte",
+  docUrl:"https://drive.google.com/file/d/1UcK5iW-i6x1bCgAL5h6VzNDmHG71ywSg/view",
+  teoria:[
+    {h:"Tema 30 — Fisiología del ejercicio: sistemas energéticos",p:"El sarcómero (espacio entre dos líneas Z) es la unidad básica de la contracción muscular, producida por el deslizamiento de la actina sobre la miosina. La unidad motriz es el conjunto de una motoneurona y todas las fibras que inerva. Se distinguen fibras Tipo I (Lentas/ST/Rojas), Tipo IIa y Tipo IIb (Rápidas/FT/Blancas). Los tres sistemas energéticos son: anaeróbico aláctico o de fosfágenos (ATP-PC, esfuerzos ≤10 s, agotamiento hacia los 30 s), anaeróbico láctico o glucólisis anaeróbica (20 s a 1-3 min) y aeróbico u oxidativo (glucólisis, ciclo de Krebs y cadena de transporte de electrones). La ruptura de una molécula de ATP libera 7,6 kcal/mol, reduciéndola a ADP y fosfato inorgánico."},
+    {h:"Tema 31 — Habilidades motrices básicas y aprendizaje motor",p:"Siguiendo a Batalla (2010), las habilidades motrices básicas se clasifican en desplazamientos (habituales: marcha/carrera; no habituales: activos y pasivos), saltos, giros (eje vertical, sagital u horizontal) y manejo de objetos (con o sin adaptación al objeto). Schmidt y Wrisberg (2004) clasifican las habilidades específicas según percepción (acciones abiertas/cerradas), toma de decisiones y ejecución (discretas, seriadas, continuas). Siguiendo a Bloom (1985), el aprendizaje motor pasa por tres fases: inicial o cognitiva, de desarrollo o asociativa, y de perfección o autónoma."},
+    {h:"Tema 32 — Condición física, capacidades físicas y principios de entrenamiento",p:"La condición física se define (Martín y col., 2001) como el componente del rendimiento basado en la interacción de los procesos energéticos, manifestado en fuerza, resistencia, velocidad y flexibilidad. Bompa (2000) añade agilidad y coordinación (con subtipos: dinámica general, óculo-pédica, óculo-manual, equilibrio estático/dinámico). Manso y col. (1998) distinguen principios fisiológicos (unidad funcional, sobrecarga) y metodológicos (progresión, multilateralidad, variedad, continuidad, reversibilidad, individualización, especificidad, planificación)."},
+    {h:"Temas 33-34 — Resistencia: adaptaciones y métodos de entrenamiento",p:"La resistencia (Jones y Carter, 2000) es la capacidad de mantener una velocidad/potencia el mayor tiempo posible. Adaptaciones al entrenamiento: neuromusculares (hasta +25% del área de fibras tipo I), cardiovasculares (+20% del volumen plasmático, mayor volumen sistólico, menor FC) y metabólicas (mayor oxidación de grasas). Métodos: continuo extensivo (65-75% FCmáx, 15 min a 6 h), continuo intensivo (65-90% FCmáx, 10-60 min) e interválico de alta intensidad (>90% FCmáx, intervalos de 2-4 min, recuperación activa al 40-50% VO2max)."},
+    {h:"Temas 35-38 — Fuerza, velocidad y potencia",p:"García Manso (1999) define la fuerza como la capacidad de vencer o soportar una resistencia mediante contracción muscular (isométrica/anisométrica, concéntrica/excéntrica/pliométrica). Adaptaciones: resistencia muscular (15-25 repeticiones, 50-60% de 1RM), hipertrofia (3-5 series de 8-12 repeticiones, 60-80% de 1RM) y fuerza máxima (85-95% de 1RM, 2-5 repeticiones, descanso mínimo 3 min). El Sprint Interval Training se estructura en 4-6 series de 30 s con 4 min de recuperación; en pliometría se recomiendan 40-80 saltos para principiantes y hasta 100-120 para experimentados."},
+    {h:"Tema 39 — Flexibilidad: componentes y técnicas de estiramiento",p:"La flexibilidad (Holt, Pelham y Holt, 2008) tiene cuatro componentes: movilidad, extensibilidad, elasticidad y plasticidad, con seis tipos de rango de movimiento (normal, de trabajo, limitado, extremo, lesivo, óptimo). La Facilitación Neuromuscular Propioceptiva (FNP) fue creada por Herman Kabat (1946-1950) e introducida por Knott y Voss (1968), con variantes CR, HR, CHRS, CRAC y HRAC. El estiramiento estático en calentamiento no debería superar los 2 minutos por grupo muscular, con series de 5-15 segundos al 80-85% del ROM máximo; el estiramiento balístico se desaconseja por activar el reflejo miotático de estiramiento."},
+    {h:"Tema 40 — Deportes individuales, de lucha y de raqueta",p:"Según Parlebas (1986), los deportes individuales se clasifican por el medio en estable (nula incertidumbre: atletismo en pista, natación) e inestable (escalada). Torres (1994) clasifica los deportes de lucha en: coger/agarrar/inmovilizar (judo, lucha grecorromana), tocar sin armas (boxeo, karate) y tocar con implemento (esgrima, kendo). Los deportes de raqueta se dividen en raqueta/pala (tenis, pádel) y de muro/pared (squash, pelota vasca)."},
+    {h:"Tema 41 — Deportes colectivos",p:"Hernández-Moreno (2000) y Riera (1989) definen el deporte colectivo por la existencia de compañeros y adversarios. Riera (1989) y Bayer (1986) enumeran 9 elementos comunes: móvil, terreno de juego, metas, puntuación, compañeros, tiempo de juego, adversarios, objetivos y reglamento. Méndez-Giménez (2014) clasifica los deportes colectivos en: blanco y diana, bate y campo, cancha dividida, muro y pared, e invasión (fútbol 11vs11 en campo de 90-120x45-90m; baloncesto 5vs5 en pista de 28x15m con canasta a 3,05m; balonmano 7vs7 en campo de 40x20m)."},
+    {h:"Temas 42-43 — Deporte adaptado e inclusivo",p:"Estructuras internacionales: IPC (Comité Paralímpico Internacional), IBSA (ciegos), CP-ISRA (parálisis cerebral), Virtus (discapacidad intelectual) y Special Olympics. La clasificación funcional visual paralímpica tiene 3 clases: B1 (ciegos totales), B2 (agudeza hasta 20/600 o campo <5°) y B3 (entre 20/600-20/200, o campo 5-20°). En lesión medular: tetraplejia (C1-C8/T1), paraplejia alta (T2-T12) y paraplejia baja (L1-L5/S1-S4); la Boccia se clasifica en perfiles BC1 a BC4. Reina (2014) describe 4 tipos de programas: específicos, paralelos, integrados e inclusivos."},
+    {h:"Temas 44-45 — Musculación: fisiología, métodos y seguridad",p:"El músculo esquelético supone el 36-45% del peso corporal, con más de 600 músculos y tres capas de tejido conjuntivo (endomisio, perimisio, epimisio). La contracción se activa por la liberación de calcio del retículo sarcoplasmático, que se une a la troponina permitiendo el deslizamiento de actina sobre miosina. Tres métodos: resistencia muscular (>12-15 repeticiones), hipertrofia (3-6 series de 6-12 repeticiones) y fuerza máxima (<6 repeticiones, descansos largos). Según el Colegio Americano de Medicina del Deporte, existen 3 niveles de urgencia (sin urgencia, potencialmente peligrosa, peligrosa para la vida), exigiendo siempre un consentimiento informado firmado por el usuario."},
+  ],
+  quiz:[
+    {q:"¿Qué vía metabólica predomina en un esfuerzo máximo de muy corta duración (pocos segundos)?",opts:["Vía aeróbica","Vía anaeróbica láctica","Vía anaeróbica aláctica (fosfágenos)","Vía oxidativa de grasas"],correct:2,note:"Los fosfágenos (ATP-PC) dominan los esfuerzos máximos de muy corta duración."},
+    {q:"¿Qué principio del entrenamiento indica que las adaptaciones deben ajustarse a las características de cada deportista?",opts:["Reversibilidad","Individualización","Sobrecarga","Densidad"],correct:1,note:"El principio de individualización adapta la carga a cada deportista."},
+    {q:"¿Qué unidad de planificación agrupa varios microciclos con un objetivo común?",opts:["Macrociclo","Mesociclo","Sesión","Serie"],correct:1,note:"El mesociclo agrupa varios microciclos en torno a un objetivo intermedio."},
+    {q:"¿Qué indicador fisiológico representa el consumo máximo de oxígeno que un individuo puede utilizar durante un esfuerzo intenso?",opts:["La frecuencia cardíaca máxima","El VO2 máx","El umbral anaeróbico","La deuda de oxígeno"],correct:1,note:"El VO2 máx es el principal indicador de la potencia aeróbica máxima.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es el umbral láctico o anaeróbico?",opts:["La frecuencia cardíaca en reposo","La intensidad de ejercicio a partir de la cual la producción de lactato supera su eliminación y este empieza a acumularse en sangre","El límite máximo de repeticiones en una serie de fuerza","La temperatura corporal máxima tolerable durante el ejercicio"],correct:1,note:"El umbral láctico marca la intensidad a partir de la cual el lactato se acumula progresivamente en sangre.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Cuál es la principal molécula responsable del transporte de oxígeno en la sangre?",opts:["La glucosa plasmática","El lactato","La hemoglobina, presente en los glóbulos rojos","La mioglobina extracelular"],correct:2,note:"La hemoglobina, contenida en los eritrocitos, transporta el oxígeno desde los pulmones a los tejidos.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es el Fartlek como método de entrenamiento?",opts:["Un método de entrenamiento de fuerza máxima con cargas pesadas","Un método continuo de carrera con variaciones de ritmo/intensidad no estrictamente pautadas, combinando terreno y sensación de esfuerzo","Una técnica exclusiva de estiramiento pasivo","Un test de valoración antropométrica"],correct:1,note:"El Fartlek ('juego de piernas') combina tramos de distinta intensidad de forma variable, aprovechando el terreno.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es la potencia mecánica en términos de biomecánica del entrenamiento de fuerza?",opts:["El resultado de multiplicar la fuerza aplicada por la velocidad de ejecución del movimiento","Solo la carga máxima que puede levantarse una vez","La resistencia del músculo a fatigarse","El ángulo articular óptimo de un ejercicio"],correct:0,note:"Potencia = Fuerza × Velocidad; es clave en gestos deportivos explosivos.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué son las capacidades físicas condicionales, a diferencia de las coordinativas?",opts:["Fuerza, resistencia, velocidad y flexibilidad, determinadas principalmente por procesos energético-musculares","Coordinación y equilibrio exclusivamente","Solo la técnica deportiva específica","La táctica de equipo"],correct:0,note:"Las capacidades condicionales (fuerza, resistencia, velocidad, flexibilidad) dependen de procesos metabólico-musculares; las coordinativas (equilibrio, coordinación, ritmo) dependen del sistema nervioso.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué máquina de musculación permite trabajar el bíceps femoral en posición de sedestación o decúbito prono con apoyo específico, típica en salas de fitness?",opts:["El banco Scott (o pupitre de bíceps)","La máquina de curl femoral (leg curl)","La prensa de piernas","El remo bajo"],correct:1,note:"La máquina de curl femoral (leg curl) trabaja específicamente los isquiosurales; el banco Scott, en cambio, se emplea para el bíceps braquial.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es la elasticidad de un tejido muscular o conjuntivo?",opts:["La capacidad de la piel para quedar permanentemente deformada","La capacidad de rodar sin fricción articular","La capacidad de un tejido de alargarse ante una fuerza de tracción y recuperar su longitud de reposo al cesar dicha fuerza","La rotación articular dependiente solo de la densidad ósea"],correct:2,note:"La elasticidad es la propiedad de deformarse ante una fuerza y volver a su forma/longitud original al cesar esta.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿En qué consiste la técnica de estiramiento por Facilitación Neuromuscular Propioceptiva (FNP) de 'contracción-relajación'?",opts:["Rebotes rítmicos con sobrecarga externa","Un estiramiento pasivo previo, seguido de una contracción isométrica del músculo estirado contra resistencia y, tras relajar, un nuevo estiramiento más profundo","Flexión balística repetida en apnea","Una contracción isocinética a rango corto"],correct:1,note:"La FNP combina estiramiento pasivo, contracción isométrica resistida y relajación para lograr mayor amplitud articular.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Por qué se desaconseja en general el estiramiento balístico (con rebotes) frente al estático?",opts:["Porque atrofia la masa ósea","Porque reduce el tono del sistema nervioso parasimpático","Porque los rebotes pueden activar el reflejo miotático de estiramiento, provocando una contracción de defensa mientras el músculo está muy elongado, aumentando el riesgo de lesión","Porque aumenta permanentemente los niveles de creatina-cinasa"],correct:2,note:"El rebote activa el reflejo miotático, generando una contracción refleja que puede lesionar el músculo estirado bruscamente.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"Según las taxonomías clásicas de los deportes (p. ej. Parlebas), ¿qué caracteriza a deportes individuales como la natación o el atletismo de carreras?",opts:["Alta incertidumbre por cambios constantes de normativa durante la prueba","Valoración exclusivamente artística del jurado","Fuerte oposición táctica directa e interacción constante con el rival","Baja incertidumbre del medio y ausencia de interacción motriz directa con el adversario, al competir cada deportista de forma independiente"],correct:3,note:"Los deportes psicomotrices individuales (sin oponente directo en el mismo espacio de juego) presentan baja incertidumbre relativa al entorno y ausencia de interacción motriz de oposición.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"En la clasificación funcional de deportes para personas con discapacidad visual, ¿qué caracteriza a la categoría B1?",opts:["Miopía leve corregida con gafas","Ceguera total o percepción luminosa muy limitada, sin distinguir formas ni siluetas","Visión central normal con pérdida de campo periférico","Afectación exclusivamente motora, no visual"],correct:1,note:"La categoría B1 corresponde al grado de mayor afectación visual: ausencia de percepción de luz o percepción luminosa sin reconocimiento de forma.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué deporte adaptado se practica en piscina, con balón sonoro, dirigido específicamente a personas con discapacidad visual?",opts:["El goalball","El torball, jugado en una pista con balón sonoro que debe hacerse pasar bajo la red rival","La boccia","El showdown"],correct:1,note:"El torball es un deporte de pista (no acuático) para personas ciegas o con baja visión, jugado con un balón sonoro; el goalball es similar pero de campo, no de piscina.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué efecto cardiovascular produce, en igualdad de intensidad relativa, el ejercicio aeróbico en inmersión (agua) respecto al mismo ejercicio en seco?",opts:["Bloquea el tórax y provoca una bradicardia extrema y peligrosa","La presión hidrostática favorece el retorno venoso, lo que tiende a reducir ligeramente la frecuencia cardíaca respecto al ejercicio equivalente en tierra","Triplica siempre el umbral aeróbico y el lactato","Elimina cualquier variación de la frecuencia cardíaca durante el esfuerzo"],correct:1,note:"La inmersión favorece el retorno venoso por la presión hidrostática, lo que suele traducirse en frecuencias cardíacas algo menores que en seco para la misma carga relativa.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es la Escala de Borg (RPE)?",opts:["Un test de fuerza máxima isométrica","Un cuestionario médico previo al acceso a instalaciones deportivas","Una escala psicofísica validada para cuantificar el esfuerzo percibido subjetivamente por el deportista durante el ejercicio","Un método de monitorización continua mediante Holter de 24 horas"],correct:2,note:"La escala de Borg (RPE, Rating of Perceived Exertion) mide de forma subjetiva y validada la percepción del esfuerzo.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué son las capacidades coordinativas, a diferencia de las condicionales?",opts:["El trofismo muscular y la resistencia a la insulina","La coordinación y el equilibrio, entre otras, reguladas principalmente por el sistema nervioso","La fuerza-velocidad y la resistencia cardiorrespiratoria","La excitación nerviosa y el umbral láctico"],correct:1,note:"Las capacidades coordinativas (equilibrio, coordinación, orientación espacial, ritmo, etc.) dependen sobre todo de procesos de regulación y control del sistema nervioso.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué mide el índice GAP (o similares como el de Sargent) en la valoración de la capacidad de salto?",opts:["La fuerza explosiva del tren inferior a través de la altura o distancia alcanzada en un salto vertical u horizontal","La flexibilidad de la columna lumbar","La capacidad aeróbica máxima","La composición corporal"],correct:0,note:"Los tests de salto (Sargent, Abalakov, CMJ, etc.) valoran la fuerza explosiva/potencia del tren inferior.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué es el sarcómero?",opts:["El conjunto de una motoneurona y todas las fibras que inerva","El espacio comprendido entre dos líneas Z, unidad básica de la contracción muscular","Una proteína contráctil exclusiva del músculo cardiaco","El tejido conjuntivo que envuelve el músculo completo"],correct:1,note:"El sarcómero, delimitado por dos líneas Z, es la unidad básica de la contracción muscular por deslizamiento de actina sobre miosina.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué se entiende por 'unidad motriz'?",opts:["El conjunto formado por una motoneurona y todas las fibras musculares a las que inerva","Un grupo de 10 fibras musculares tipo I","La suma de todos los sarcómeros de un músculo","El conjunto de tendones y ligamentos de una articulación"],correct:0,note:"La unidad motriz es una motoneurona junto con todas las fibras que inerva.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Quién creó la técnica de estiramiento de Facilitación Neuromuscular Propioceptiva (FNP)?",opts:["Herman Kabat, entre 1946 y 1950","Pierre Parlebas en 1986","Tudor Bompa en el año 2000","Tom Bompa y Carter en 1999"],correct:0,note:"La FNP fue creada por Herman Kabat entre 1946 y 1950, e introducida posteriormente por Knott y Voss en 1968.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"Según Riera (1989) y Bayer (1986), ¿cuántos elementos comunes caracterizan a los deportes colectivos?",opts:["4 elementos","6 elementos","9 elementos: móvil, terreno de juego, metas, puntuación, compañeros, tiempo de juego, adversarios, objetivos y reglamento","12 elementos"],correct:2,note:"Riera (1989) y Bayer (1986) identifican 9 elementos comunes de los deportes colectivos.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"En la clasificación funcional de deportistas con lesión medular, ¿qué nivel corresponde a la 'paraplejia alta'?",opts:["C1-C8/T1","T2-T12","L1-L5/S1-S4","No existe esta categoría"],correct:1,note:"La paraplejia alta corresponde a los niveles T2-T12; la tetraplejia a C1-C8/T1; la paraplejia baja a L1-L5/S1-S4.",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+    {q:"¿Qué caracteriza el método de entrenamiento continuo extensivo de resistencia?",opts:["65-75% de la FCmáx, por debajo del segundo umbral ventilatorio, de 15 minutos a 6 horas","Solo sprints de 10 segundos con recuperación completa","Un único esfuerzo máximo de 30 segundos","Intensidad superior al 95% del VO2max en todo momento"],correct:0,note:"El continuo extensivo se sitúa entre el 65-75% de la FCmáx, por debajo del segundo umbral ventilatorio, con duraciones largas (15 min-6 h).",fuente:"Bloque6_CienciasDelDeporte_Temas30-45.docx"},
+  ]
+},
+{
+  id:"b7", nombre:"Bloque 7", temas:"8 y 19", titulo:"Violencia, racismo y disciplina deportiva",
+  docUrl:"https://drive.google.com/file/d/1pSzJ6B_uSYd9PLWCB4zIGu-A1XpP9Pon/view",
+  teoria:[
+    {h:"Objeto, ámbito y conductas tipificadas (Ley 19/2007, arts. 1-2)",p:"La Ley 19/2007 tiene por objeto (art. 1) fomentar el juego limpio, mantener la seguridad ciudadana, establecer el régimen disciplinario y sancionador deportivo, y eliminar el racismo y la LGTBIfobia en el deporte. Se aplica a competiciones deportivas oficiales de ámbito estatal. El art. 2 define de forma exhaustiva los actos violentos o que incitan a ella (altercados, exhibición de pancartas/símbolos, irrupción en el terreno de juego) y los actos racistas, xenófobos o intolerantes (amenazas, acoso, insultos vejatorios, cánticos discriminatorios)."},
+    {h:"Obligaciones de organizadores y dispositivos de seguridad (arts. 3-14)",p:"Los organizadores deben adoptar medidas de seguridad y colaborar con el Coordinador de Seguridad (miembro de la organización policial, obligatorio en fútbol y baloncesto de máxima categoría profesional). Se prohíbe la introducción de alcohol/drogas en las instalaciones (art. 4). Son obligatorios: CCTV (art. 8), libro de registro de actividades de seguidores (art. 9), declaración de encuentros de alto riesgo por la Comisión Estatal (art. 10) y venta informatizada de entradas en recintos profesionales (art. 11)."},
+    {h:"La Comisión Estatal y el Observatorio contra la Violencia (arts. 16, 20)",p:"El art. 20 crea la Comisión Estatal contra la Violencia, el Racismo, la Xenofobia y la Intolerancia en el Deporte, órgano colegiado con representantes de la AGE, CCAA, federaciones y personas de reconocido prestigio, con funciones de prevención, vigilancia, control, estadística y la potestad de declarar acontecimientos de alto riesgo. El Observatorio de la Violencia, el Racismo, la Xenofobia y la Intolerancia en el Deporte (art. 16.1.d) está adscrito al CSD. También se regula la figura del Defensor del Deportista (art. 16.1.h)."},
+    {h:"Régimen sancionador administrativo (arts. 21-31)",p:"Se tipifican infracciones de organizadores (art. 21), espectadores (art. 22) y de cualquier sujeto, incluidas declaraciones mediáticas que inciten a la violencia (art. 23). Las sanciones económicas (art. 24.1) van de 150-3.000€ (leves), 3.000,01-60.000€ (graves) a 60.000,01-650.000€ (muy graves); a personas físicas, prohibición de acceso a recintos de 1-6 meses (leve), 6 meses-2 años (grave) y 2-5 años (muy grave). La competencia sancionadora se escalona (art. 28): Delegación del Gobierno hasta 60.000€, Secretaría de Estado de Seguridad hasta 180.000€, Ministerio del Interior hasta 360.000€, y Consejo de Ministros hasta 650.000€."},
+    {h:"Régimen disciplinario deportivo contra la violencia (Título III, arts. 32-37)",p:"Se aplica a personas con licencia federativa, clubes y SAD. Solo se tipifican infracciones muy graves (art. 34: comportamientos agresivos, organización/encubrimiento de actos violentos) y graves (art. 35). Las sanciones muy graves (art. 36) incluyen inhabilitación de 2 a 5 años, multas de hasta 90.000€ en competición profesional, clausura de hasta una temporada y pérdida de puntos. Los expedientes deben durar máximo un mes, prorrogable otro mes (art. 37.3); si se supera, la competencia pasa al Comité Español de Disciplina Deportiva (hoy Tribunal Administrativo del Deporte)."},
+    {h:"RD 1591/1992: disciplina deportiva general y procedimiento",p:"Desarrolla el régimen disciplinario deportivo general, distribuyendo la potestad disciplinaria entre jueces/árbitros, clubes, federaciones (Comité de Competición), ligas y el CEDD/TAD. Las infracciones se clasifican en muy graves, graves y leves (art. 13), con sanciones muy graves de 3.005,06€ a 30.050,61€ y prescripción de 3 años/1 año/1 mes según gravedad. El procedimiento extraordinario exige un Instructor licenciado en Derecho, con pliego de cargos en 1 mes y resolución en 10 días hábiles; los recursos se interponen en 10 días hábiles (primera instancia) o 15 días hábiles ante el CEDD/TAD."},
+  ],
+  quiz:[
+    {q:"¿Qué órgano coordina la actuación de las Administraciones contra la violencia en el deporte?",opts:["El Comité Olímpico Español","La Comisión Estatal contra la Violencia, el Racismo, la Xenofobia y la Intolerancia en el Deporte","El Consejo de Transparencia","La Agencia Mundial Antidopaje"],correct:1,note:"Esta Comisión Estatal es el órgano de coordinación específico en la materia."},
+    {q:"Según el art. 24.1 de la Ley 19/2007, ¿entre qué importes se sitúa la sanción económica por una infracción muy grave?",opts:["150 a 3.000 €","3.000,01 a 60.000 €","60.000,01 a 650.000 €","No hay sanción económica, solo inhabilitación"],correct:2,note:"Las infracciones muy graves se sancionan con multa de 60.000,01€ a 650.000€.",fuente:"Bloque7_ViolenciaRacismo_DisciplinaDeportiva_Temas8y19.docx"},
+    {q:"¿A qué órgano corresponde imponer sanciones económicas de hasta 650.000 € por infracciones muy graves (art. 28)?",opts:["La Delegación del Gobierno","La Secretaría de Estado de Seguridad","El Ministerio del Interior","El Consejo de Ministros"],correct:3,note:"El Consejo de Ministros es competente para las sanciones más elevadas, entre 360.000,01€ y 650.000€.",fuente:"Bloque7_ViolenciaRacismo_DisciplinaDeportiva_Temas8y19.docx"},
+    {q:"¿Cuánto puede durar la prohibición de acceso a recintos deportivos impuesta a una persona física por una infracción muy grave (art. 24.3)?",opts:["De 1 a 6 meses","De 6 meses a 2 años","De 2 a 5 años","Es siempre indefinida"],correct:2,note:"Las infracciones muy graves conllevan prohibición de acceso de 2 a 5 años; las leves, 1-6 meses; las graves, 6 meses-2 años.",fuente:"Bloque7_ViolenciaRacismo_DisciplinaDeportiva_Temas8y19.docx"},
+    {q:"¿Qué tipo de conducta tipifica como infracción muy grave la ley contra la violencia en el deporte respecto al público asistente a un recinto deportivo?",opts:["Llevar bufanda del equipo visitante","La exhibición de pancartas, símbolos, emblemas o leyendas que inciten a la violencia o contengan mensajes racistas o xenófobos","Aplaudir a ambos equipos","Llegar tarde al estadio"],correct:1,note:"La exhibición de símbolos o mensajes que inciten a la violencia, el racismo o la xenofobia se tipifica como infracción muy grave.",fuente:"Bloque7_ViolenciaRacismoDisciplina_Temas8y19.docx"},
+    {q:"¿Qué sanción puede imponerse, entre otras, a quien cometa una infracción muy grave en materia de violencia en el deporte?",opts:["Ninguna, solo se hace una advertencia verbal","Prohibición de acceso a recintos deportivos, entre otras sanciones económicas y accesorias","Expulsión definitiva del país","Prisión automática sin juicio"],correct:1,note:"Entre las sanciones por infracciones muy graves se contempla la prohibición de acceso a recintos deportivos, además de sanciones económicas.",fuente:"Bloque7_ViolenciaRacismoDisciplina_Temas8y19.docx"},
+    {q:"En el ámbito disciplinario deportivo general del Estado, ¿qué distingue a las infracciones muy graves de las graves y leves?",opts:["No existe tal distinción, todas las infracciones tienen la misma sanción","Se gradúan según la entidad de la infracción, con sanciones proporcionalmente más severas para las muy graves (p. ej. inhabilitación de mayor duración)","Solo las leves tienen sanción económica","Las muy graves solo aplican a árbitros"],correct:1,note:"El régimen disciplinario deportivo gradúa las infracciones en leves, graves y muy graves, con sanciones proporcionales a su gravedad.",fuente:"Bloque7_ViolenciaRacismoDisciplina_Temas8y19.docx"},
+    {q:"¿Qué papel desempeñan los Coordinadores de Seguridad en los recintos deportivos según la normativa contra la violencia en el deporte?",opts:["Ninguno, es una figura inexistente","Son responsables de coordinar las medidas de seguridad y prevención de la violencia en el recinto durante los eventos deportivos de riesgo","Sustituyen al árbitro en caso de lesión","Solo actúan en competiciones internacionales"],correct:1,note:"Los Coordinadores de Seguridad coordinan las medidas de prevención y seguridad en los recintos, especialmente en encuentros de alto riesgo.",fuente:"Bloque7_ViolenciaRacismoDisciplina_Temas8y19.docx"},
+    {q:"En el régimen disciplinario deportivo específico contra la violencia (Título III Ley 19/2007), ¿qué niveles de infracción se tipifican?",opts:["Leves, graves y muy graves, los tres niveles","Solo infracciones muy graves y graves, sin infracciones leves","Solo infracciones leves","No existen infracciones, solo medidas cautelares"],correct:1,note:"El Título III de la Ley 19/2007 (arts. 34-35) solo tipifica infracciones muy graves y graves, a diferencia del régimen general del RD 1591/1992 que sí incluye leves.",fuente:"Bloque7_ViolenciaRacismo_DisciplinaDeportiva_Temas8y19.docx"},
+    {q:"Si un expediente disciplinario abierto al amparo de la Ley 19/2007 supera el plazo máximo de un mes (prorrogable otro mes) sin resolverse, ¿qué ocurre (art. 37.3)?",opts:["El expediente se archiva automáticamente sin sanción","La competencia pasa al Comité Español de Disciplina Deportiva (hoy Tribunal Administrativo del Deporte)","Se traslada a la vía penal obligatoriamente","No pasa nada, el plazo no es preclusivo"],correct:1,note:"Superado el plazo máximo, la competencia para resolver pasa al CEDD/TAD.",fuente:"Bloque7_ViolenciaRacismo_DisciplinaDeportiva_Temas8y19.docx"},
+  ]
+},
+{
+  id:"b8", nombre:"Bloque 8", temas:"4,5,16,20,23,24,26-29", titulo:"Temas institucionales del deporte",
+  docUrl:"https://drive.google.com/file/d/1zTDq9mXiHCprX_RYE5OFLnp78NCdnAQI/view",
+  teoria:[
+    {h:"Tema 4 — El Comité Olímpico Internacional y las Federaciones Internacionales",p:"El COI es la autoridad suprema del Movimiento Olímpico: organización internacional no gubernamental sin fines lucrativos, con sede en Lausana, regida por la Carta Olímpica. Sus órganos son la Sesión (asamblea general, órgano supremo), la Comisión Ejecutiva (gestión), el Presidente (elegido por 8 años, renovable una vez por 4) y la Comisión de Ética. El COI reconoce a las Federaciones Internacionales (que rigen cada deporte a nivel mundial, con autonomía en la administración de su deporte) y a los Comités Olímpicos Nacionales. Estructura: COI → FI → CON (como el COE) → federaciones nacionales."},
+    {h:"Tema 5 — España en los Juegos Olímpicos",p:"España debutó en París 1900 (8 deportistas, primera medalla de oro en pelota vasca). Estuvo ausente en Berlín 1936. Barcelona 1992 fue el único año en que España fue sede de unos Juegos de Verano y su mejor resultado histórico: 22 medallas (13 oro), 6º puesto en el medallero; Miriam Blasco (judo) fue la primera medalla femenina española. Desde 1992 España logra medallas de dos dígitos en cada edición. Los deportes más laureados históricamente son vela y piragüismo."},
+    {h:"Tema 20 — Programa España Compite y beneficios fiscales del mecenazgo deportivo",p:"'España Compite' es una Actividad Prioritaria de Mecenazgo (art. 22 Ley 49/2002), gestionada por la Fundación Deporte Joven junto con el CSD, para impulsar PYMES vinculadas al deporte. Como actividad prioritaria, permite deducciones de hasta el 40% en los dos primeros años y 45% desde el tercero (frente al 35% ordinario), con límite de 50.000€ anuales por aportante."},
+    {h:"Tema 23 — PROAD: Programa de Atención al Deportista",p:"Activo desde 2009, ofrece atención personalizada a deportistas de alto nivel (DAN) y alto rendimiento (DAR) para su carrera dual, mediante una red de tutores-consultores. Subprogramas: Transición Deportiva, Menores, Formación, Empleo, y Premios CSD-Carrera Dual. Actualmente atiende a más de 6.000 deportistas."},
+    {h:"Tema 24 — Fundación Deporte Joven",p:"Constituida el 8 de febrero de 1996 a instancias del CSD, es una fundación del sector público estatal dependiente del CSD. Su Patronato está presidido por la Presidencia del CSD e integra patronos privados (Fundación ACS, Cruz Roja, Fundación LaLiga, ONCE, RTVE, entre otros), reuniéndose en Pleno semestral. Líneas de actuación: hábitos saludables, colaboración empresarial (gestión de AEIP), carrera dual, deporte y valores."},
+    {h:"Temas 26-27 — Acontecimientos de Excepcional Interés Público y ADESP",p:"Los AEIP (art. 27 Ley 49/2002) se declaran anualmente por Ley de Presupuestos y otorgan beneficios fiscales a patrocinadores. El Plan 2030 de Apoyo al Deporte de Base, declarado AEIP por primera vez en la Ley de PGE 2022, es gestionado por la Fundación Deporte Joven y el CSD. ADESP (Asociación del Deporte Español) es una asociación privada constituida por las federaciones deportivas españolas, sin regulación por ley específica, que presta asesoramiento jurídico/laboral/fiscal y actúa como interlocutora ante las Administraciones."},
+    {h:"Tema 29 — Plan ADO y Plan ADOP",p:"El Plan ADO, activo desde 1988, es un programa de financiación mixta impulsado por el COE, el CSD y RTVE, financiado por empresas patrocinadoras, que otorga becas a deportistas olímpicos según resultados. El Plan ADOP es su equivalente paralímpico, impulsado por el CSD, el Comité Paralímpico Español y los ministerios competentes. Ambos incluyen programas de becas, servicios de apoyo al entrenamiento, ayuda directa a federaciones y relevo generacional."},
+  ],
+  quiz:[
+    {q:"¿Qué entidad representa a España ante el movimiento olímpico internacional?",opts:["El Consejo Superior de Deportes","El Comité Olímpico Español","La federación deportiva correspondiente","El Ministerio de Asuntos Exteriores"],correct:1,note:"El Comité Olímpico Español (COE) representa a España ante el movimiento olímpico."},
+    {q:"¿Qué entidad representa a España ante el movimiento paralímpico internacional?",opts:["El Comité Olímpico Español","El Comité Paralímpico Español (CPE)","El Consejo Superior de Deportes","La ONCE"],correct:1,note:"El Comité Paralímpico Español es la entidad que representa a España ante el movimiento paralímpico internacional.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué es la Asociación de Deportes Olímpicos (ADO) / el programa ADO?",opts:["Un programa de apoyo económico a deportistas con opciones de medalla olímpica, financiado por CSD, COE, RTVE y patrocinadores privados","Una federación deportiva más","Una ONG internacional sin relación con el deporte estatal","Un impuesto sobre espectáculos deportivos"],correct:0,note:"El Plan ADO es un programa de financiación a deportistas de alto nivel con opciones olímpicas, sostenido por CSD, COE, RTVE y empresas patrocinadoras.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué es ADESP?",opts:["La Asociación del Deporte Español, entidad que agrupa a las federaciones deportivas españolas","Un tipo de beca deportiva","Un impuesto sobre patrocinios","El nombre anterior del CSD"],correct:0,note:"ADESP (Asociación del Deporte Español) agrupa a las federaciones deportivas españolas y representa sus intereses comunes.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Cuál es la principal función de las Ligas profesionales en el deporte español (p. ej. LaLiga, ACB)?",opts:["Sustituir a la federación correspondiente en todas sus funciones","La organización de las competiciones profesionales oficiales de ámbito estatal en su modalidad, en colaboración con la respectiva federación","Otorgar licencias de árbitro","Fijar el calendario escolar"],correct:1,note:"Las ligas profesionales organizan las competiciones oficiales de carácter profesional, junto con la federación correspondiente.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué se entiende por 'deporte de alto rendimiento' a efectos del interés general reconocido por el Estado?",opts:["Cualquier práctica deportiva de ocio","El que se considera de interés para el Estado por representar un factor esencial en el desarrollo deportivo, por su función representativa de España y por ser referencia del deporte de base","La actividad física escolar obligatoria","Los deportes exclusivamente amateurs"],correct:1,note:"El deporte de alto rendimiento se considera de interés general al ser factor de desarrollo deportivo, representación estatal y referencia para el deporte de base.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué órgano ostenta la presidencia del Consejo Superior de Deportes?",opts:["Un cargo elegido por sufragio universal","La Presidencia, con rango orgánico determinado reglamentariamente, nombrada por el Gobierno","El Presidente del Comité Olímpico Español, automáticamente","El Ministro de Hacienda"],correct:1,note:"La Presidencia del CSD es nombrada por el Gobierno, con el rango que se determine reglamentariamente.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué es la Asamblea General del CSD?",opts:["Un órgano consultivo y de representación de los distintos agentes del sistema deportivo (federaciones, CCAA, Comité Olímpico, etc.)","El órgano ejecutivo diario del CSD","Un tribunal disciplinario","Una comisión exclusivamente económica"],correct:0,note:"La Asamblea General del CSD es un órgano de representación y consulta de los distintos agentes del sistema deportivo español.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Qué son los Centros de Alto Rendimiento (CAR) gestionados por el CSD?",opts:["Instalaciones deportivas de titularidad estatal orientadas a la tecnificación y preparación de deportistas de alto nivel, con servicios médicos y científicos especializados","Gimnasios privados de pago","Colegios con especialidad deportiva","Federaciones autonómicas"],correct:0,note:"Los CAR son instalaciones estatales que ofrecen entrenamiento, alojamiento y servicios médico-científicos a deportistas de alto nivel.",fuente:"Bloque8_TemasInstitucionales.docx"},
+    {q:"¿Por cuántos años se elige a la Presidencia del Comité Olímpico Internacional (Norma 20 de la Carta Olímpica)?",opts:["4 años, renovable indefinidamente","8 años, renovable una vez por 4 años más","10 años sin renovación","Vitalicio"],correct:1,note:"La Presidencia del COI se elige por votación secreta para un mandato de 8 años, renovable una vez por 4 años adicionales.",fuente:"Bloque8_TemasInstitucionales_4-5-16-20-23-24-26-27-28-29.docx"},
+    {q:"¿En qué edición de los Juegos Olímpicos de Verano fue España sede, logrando además su mejor resultado histórico en el medallero?",opts:["Los Ángeles 1984","Barcelona 1992","Atlanta 1996","Sídney 2000"],correct:1,note:"Barcelona 1992 fue la única vez que España fue sede de unos Juegos de Verano, con 22 medallas y 6º puesto en el medallero.",fuente:"Bloque8_TemasInstitucionales_4-5-16-20-23-24-26-27-28-29.docx"},
+    {q:"¿Qué entidad gestiona el programa 'España Compite: en la Empresa como en el Deporte' junto con el CSD?",opts:["El Comité Olímpico Español","La Fundación Deporte Joven","ADESP","El Tribunal Administrativo del Deporte"],correct:1,note:"La Fundación Deporte Joven gestiona 'España Compite' en colaboración con el CSD, como Actividad Prioritaria de Mecenazgo.",fuente:"Bloque8_TemasInstitucionales_4-5-16-20-23-24-26-27-28-29.docx"},
+    {q:"¿Qué es el PROAD?",opts:["Un impuesto sobre premios deportivos","El Programa de Atención al Deportista de Alto Nivel, activo desde 2009, orientado a la carrera dual","Una federación de deportes adaptados","El nuevo nombre del Plan ADO"],correct:1,note:"El PROAD ofrece atención personalizada a deportistas DAN/DAR para su carrera dual y transición al finalizar la etapa competitiva.",fuente:"Bloque8_TemasInstitucionales_4-5-16-20-23-24-26-27-28-29.docx"},
+  ]
+},
+{
+  id:"b9", nombre:"Bloque 9", temas:"20,24,25,26", titulo:"Mecenazgo y fundaciones deportivas",
+  docUrl:"https://drive.google.com/file/d/1y32v72qYiRcl04PhRdoIeuFGc2wEs27I/view",
+  teoria:[
+    {h:"Ley 49/2002: entidades sin fines lucrativos y requisitos (Título I-II)",p:"Son entidades sin fines lucrativos (art. 2), entre otras, las fundaciones, asociaciones de utilidad pública y las federaciones deportivas españolas, el Comité Olímpico Español y el Comité Paralímpico Español. Los requisitos (art. 3) exigen perseguir fines de interés general, destinar al menos el 70% de rentas a dichos fines (plazo: ejercicio + 4 años), no desarrollar explotaciones económicas ajenas a su objeto por encima del 40% de ingresos, cargos de patrono gratuitos, e inscripción registral. El tipo de gravamen en el Impuesto sobre Sociedades para las rentas no exentas es del 10% (art. 10). Están exentos, entre otros ingresos, los donativos, cuotas de asociados y determinadas explotaciones económicas del art. 7, incluyendo expresamente los servicios de carácter deportivo a personas físicas que practiquen deporte (apdo. 10º)."},
+    {h:"Ley 49/2002: incentivos fiscales al mecenazgo (Título III)",p:"Son entidades beneficiarias del mecenazgo (art. 16) las entidades sin fines lucrativos del Título II —incluidas las federaciones deportivas, COE y CPE—, el Estado, CCAA, Entidades Locales y universidades públicas. La deducción en el IRPF (art. 19) sigue una escala: 80% hasta 250€ de base, 40% del resto; si hay recurrencia de donaciones a la misma entidad durante 2 años anteriores, el porcentaje sobre el exceso de 250€ sube al 45%. En el Impuesto sobre Sociedades (art. 20), la deducción es del 40% de la base (50% con recurrencia), con límite del 15% de la base imponible. Los convenios de colaboración empresarial (art. 25) permiten deducir como gasto la ayuda económica a cambio de difundir la participación del colaborador."},
+    {h:"Ley 49/2002: Acontecimientos de Excepcional Interés Público (art. 27)",p:"Es la norma marco de los AEIP: programas declarados por Ley (con duración máxima de 3 años) que crean un consorcio u órgano administrativo certificador, con representación necesaria del Ministerio de Hacienda. Beneficios fiscales máximos: deducción del 15% de gastos de propaganda/publicidad del acontecimiento (límite 90% de las donaciones al consorcio), aplicación del mecenazgo prioritario con 5 puntos porcentuales adicionales, y bonificaciones del 95% en ITP/AJD, IAE e impuestos/tasas locales relacionados. La disposición adicional decimosegunda declara exentas del Impuesto sobre Sociedades las rentas derivadas de competiciones de las selecciones nacionales cuando la organización sea de exclusiva competencia de la federación, COE o CPE."},
+    {h:"Ley 50/2002 de Fundaciones: constitución, Patronato y régimen aplicable a la Fundación Deporte Joven",p:"Una fundación (art. 2) es una organización sin fin de lucro cuyo patrimonio está afectado de modo duradero a fines de interés general (deportivos entre ellos, art. 3). La dotación se presume suficiente a partir de 30.000€ (art. 12). El Patronato (arts. 14-15) es el órgano de gobierno obligatorio, mínimo 3 miembros, cargo gratuito salvo reembolso de gastos. Las cuentas anuales deben aprobarse en 6 meses desde el cierre del ejercicio (art. 25), con auditoría externa obligatoria si se superan ciertos umbrales (activo o ingresos >2.400.000€, o más de 50 trabajadores). El Protectorado (art. 34-35), ejercido por la AGE, vela por la legalidad de constitución y funcionamiento. Esta ley rige el régimen de la Fundación Deporte Joven, fundación del sector público estatal vinculada al CSD."},
+  ],
+  quiz:[
+    {q:"¿Qué tipo de beneficio ofrece la Ley 49/2002 a quienes realizan donativos a una fundación deportiva acogida a la ley?",opts:["Exención total de cualquier impuesto","Deducciones fiscales en IRPF/Impuesto de Sociedades","Una subvención directa del Estado","Ninguno, la ley no contempla incentivos"],correct:1,note:"La ley establece deducciones fiscales como incentivo al mecenazgo."},
+    {q:"¿Qué requisitos debe cumplir una fundación para ser considerada entidad sin fines lucrativos a efectos de la Ley 49/2002 (art. 3)?",opts:["Perseguir fines de interés general, destinar al menos el 70% de sus rentas a dichos fines y estar inscrita en el registro correspondiente, entre otros","Tener ánimo de lucro explícito","Ser exclusivamente de titularidad pública","No estar sujeta a ningún control"],correct:0,note:"Entre los requisitos figuran perseguir fines de interés general, destinar al menos el 70% de rentas a esos fines y la inscripción registral correspondiente.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"¿Qué es la Fundación Deporte Joven?",opts:["Una federación deportiva más","Una fundación del sector público estatal dependiente del CSD, constituida en 1996, orientada a fomentar valores y hábitos saludables entre la juventud a través del deporte","Un impuesto sobre el deporte base","Un club deportivo profesional"],correct:1,note:"La Fundación Deporte Joven, constituida en 1996 e integrada en el sector público estatal, promueve programas de fomento del deporte y valores entre los jóvenes.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"Según el art. 19 de la Ley 49/2002, ¿qué porcentaje de deducción en el IRPF se aplica a los primeros 250€ de un donativo?",opts:["40%","80%","10%","100%"],correct:1,note:"La escala del art. 19 aplica un 80% hasta 250€ de base, y un 40% al resto (45% si hay donaciones recurrentes a la misma entidad durante los 2 años anteriores).",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"¿Cuál es el tipo de gravamen en el Impuesto sobre Sociedades para las rentas no exentas de una entidad sin fines lucrativos acogida a la Ley 49/2002 (art. 10)?",opts:["25%, el tipo general","15%","10%","0%, exención total"],correct:2,note:"El art. 10 fija un tipo reducido del 10% sobre la base imponible de las rentas no exentas.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"¿Cuál es la duración máxima que puede tener un programa de apoyo a un Acontecimiento de Excepcional Interés Público (art. 27.2.a Ley 49/2002)?",opts:["1 año","3 años","5 años","10 años"],correct:1,note:"La ley que apruebe cada programa de AEIP debe fijar una duración máxima de 3 años.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"Según la Ley 50/2002 de Fundaciones, ¿a partir de qué importe se presume suficiente la dotación fundacional (art. 12)?",opts:["3.000 €","30.000 €","300.000 €","No hay cifra de referencia"],correct:1,note:"La dotación se presume suficiente a partir de 30.000€; si es inferior, debe justificarse con un estudio de viabilidad.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+    {q:"¿Qué órgano de la AGE vela por la legalidad de constitución y funcionamiento de las fundaciones de competencia estatal (arts. 34-35 Ley 50/2002)?",opts:["El Tribunal de Cuentas","El Protectorado","El Consejo Superior de Fundaciones","El Registro Mercantil"],correct:1,note:"El Protectorado, ejercido por la AGE, informa preceptivamente, asesora y vela por el cumplimiento de fines de las fundaciones estatales.",fuente:"Bloque9_MecenazgoYFundaciones_Temas20-24-25-26.docx"},
+  ]
+},
+{
+  id:"b10", nombre:"Bloque 10", temas:"—", titulo:"RD 971/2007, Ley 4/2023 LGTBI y Carta Europea del Deporte",
+  docUrl:"https://drive.google.com/file/d/1aJ6tU3IZzEGZFEW5RjxrzVJgGKtesdUp/view",
+  teoria:[
+    {h:"RD 971/2007 — Deportistas de alto nivel y alto rendimiento (arts. 1-8)",p:"Distingue entre deportistas de alto nivel (DAN, art. 2.2: acreditados por el Secretario de Estado-Presidente del CSD según los criterios del anexo, en colaboración con federaciones y CCAA) y deportistas de alto rendimiento (DAR, art. 2.3: calificados por las CCAA, con preferencia de los DAN sobre todos los demás). El acceso se valora por Grupos A-F según tipo de prueba, categoría de edad y carácter olímpico (art. 4). La Comisión de Evaluación del Deporte de Alto Nivel (art. 7), presidida por el Secretario de Estado-Presidente del CSD, se reúne al menos semestralmente."},
+    {h:"RD 971/2007 — Medidas de apoyo y pérdida de la condición (arts. 9-17)",p:"Entre las medidas: reserva mínima del 3% de plazas universitarias (5% adicional en CAFyD/Fisioterapia/Maestro de Educación Física), exención de pruebas físicas de acceso, mérito evaluable en concurso-oposición a la función pública y en Cuerpos y Fuerzas de Seguridad, y permiso retribuido para competiciones internacionales (art. 11). La duración de los efectos es de 5 años desde la resolución en el BOE, o 7 años si es medallista olímpico/paralímpico (art. 16). La pérdida de la condición (art. 15) se produce por vencimiento de plazos, sanción firme por dopaje, sanción disciplinaria grave, o competir oficialmente por otro país."},
+    {h:"Ley 4/2023 LGTBI — Objeto y medidas en el ámbito del deporte (art. 26)",p:"Garantiza la igualdad real y efectiva de las personas LGTBI (art. 1). El art. 26 obliga a las Administraciones a promover que la práctica deportiva respete el principio de igualdad y no discriminación por orientación sexual, identidad sexual o expresión de género, mediante: fomento del respeto en normas de competiciones, compromisos de clubes/federaciones en sus códigos éticos, prevención de LGTBIfobia en eventos deportivos, planes de actuación y formación de profesionales del deporte. La disposición final octava modifica la Ley 19/2007 para incluir la LGTBIfobia entre sus objetivos, ampliando las funciones de la Comisión Estatal contra la Violencia en el Deporte (ver Bloque 7)."},
+    {h:"Ley 4/2023 LGTBI — Régimen sancionador (Título IV)",p:"Las infracciones se clasifican en leves, graves y muy graves (art. 79); son muy graves, entre otras, el acoso discriminatorio, las terapias de conversión y la denegación de acceso a establecimientos o servicios. Las sanciones (art. 80) van desde apercibimiento o multa de 200-2.000€ (leves) hasta multa de 10.001-150.000€ con sanciones accesorias (muy graves, incluyendo prohibición de contratar con la Administración hasta 3 años). La prescripción de infracciones muy graves es de 3 años (art. 81)."},
+    {h:"Carta Europea del Deporte Revisada (Consejo de Europa, 2021)",p:"Es una Recomendación del Consejo de Europa (no vinculante como ley) que actualiza la Carta de 1992, estableciendo principios rectores de las políticas deportivas: el 'deporte para todos' y el derecho al deporte sin discriminación (art. 10), la ética deportiva y la integridad (arts. 7-8: protección frente a violencia/acoso, juego limpio, buena gobernanza), la sostenibilidad (art. 9) y la cooperación entre los sectores público y privado (arts. 3-5). El art. 14 aborda el apoyo al deporte de alto nivel y profesional, con atención a la carrera dual y la integridad física/moral del deportista."},
+  ],
+  quiz:[
+    {q:"¿Quién califica a los deportistas de alto rendimiento (DAR), a diferencia de los de alto nivel (DAN)?",opts:["El Comité Olímpico Internacional","Las Comunidades Autónomas","La federación internacional correspondiente","El Tribunal de Arbitraje Deportivo"],correct:1,note:"Los DAR son calificados por las Comunidades Autónomas; los DAN los reconoce el CSD junto con las CCAA."},
+    {q:"¿Qué garantiza la Ley 4/2023 en el ámbito deportivo?",opts:["Subvenciones automáticas a clubes","La igualdad real y la no discriminación de las personas LGTBI","La gratuidad de las instalaciones deportivas","La reserva de plazas para deportistas de alto nivel"],correct:1,note:"La Ley 4/2023 protege la igualdad real y efectiva de las personas LGTBI, también en el deporte."},
+    {q:"¿Qué principio defiende la Carta Europea del Deporte?",opts:["El deporte de élite exclusivamente","El 'deporte para todos' y la ética deportiva","La profesionalización obligatoria del deporte base","La eliminación de las federaciones nacionales"],correct:1,note:"La Carta promueve el acceso de todos los ciudadanos al deporte y el fair play."},
+    {q:"¿Qué efectos concretos conlleva el reconocimiento como Deportista de Alto Nivel (DAN) según el RD 971/2007?",opts:["Ninguno, es un reconocimiento simbólico sin efectos prácticos","Becas, reserva de plazas en el acceso a la función pública, facilidades académicas para compatibilizar estudios y deporte, y acceso a Centros de Alto Rendimiento","Solo exención total de impuestos","Nacionalidad española automática"],correct:1,note:"El RD 971/2007 vincula la condición de DAN a beneficios como becas, reserva de plazas públicas, facilidades académicas y acceso a CAR/CTD.",fuente:"Bloque10_RD971_LGTBI_CartaEuropea.docx"},
+    {q:"¿Qué órgano estatal coordina la lucha contra el dopaje en el deporte español?",opts:["La Agencia Española de Protección de Datos","La Agencia Española de Protección de la Salud en el Deporte (AEPSAD)","El Comité Olímpico Español, en exclusiva","El Tribunal de Cuentas"],correct:1,note:"La AEPSAD es el organismo estatal responsable de la lucha contra el dopaje y la protección de la salud del deportista.",fuente:"Bloque10_RD971_LGTBI_CartaEuropea.docx"},
+    {q:"¿A partir de qué edad, con carácter general, la Ley 4/2023 permite el ejercicio de determinados derechos de autodeterminación relacionados con la identidad de género sin necesidad de asistencia?",opts:["A partir de los 18 años en todo caso, sin excepción","Desde los 16 años con plena capacidad, y con determinadas garantías y asistencia entre los 14 y 16 años","Desde el nacimiento","No se contempla ninguna edad, es siempre libre a cualquier edad sin matices"],correct:1,note:"La Ley 4/2023 (y la LO 4/2023) contempla un régimen de capacidad progresiva, permitiendo el ejercicio pleno desde los 16 años y con asistencia entre los 14-16.",fuente:"Bloque10_RD971_LGTBI_CartaEuropea.docx"},
+    {q:"¿Qué tipo de centro complementa a los CAR ofreciendo formación a deportistas en fases más tempranas de su carrera?",opts:["Los Centros de Tecnificación Deportiva (CTD)","Los institutos de educación secundaria ordinarios","Los polideportivos municipales sin más","Las oficinas del CSD"],correct:0,note:"Los Centros de Tecnificación Deportiva (CTD) complementan a los CAR, centrados en etapas de formación y detección de talento.",fuente:"Bloque10_RD971_LGTBI_CartaEuropea.docx"},
+    {q:"Según la Carta Europea del Deporte del Consejo de Europa, ¿qué papel se atribuye a la cooperación público-privada en el desarrollo del deporte?",opts:["Se rechaza expresamente cualquier colaboración privada","Se promueve como elemento clave para ampliar el acceso al deporte y sus infraestructuras","Solo se permite en el deporte profesional","No se menciona en el texto"],correct:1,note:"La Carta Europea del Deporte fomenta la cooperación entre los sectores público y privado como vía para desarrollar el deporte para todos.",fuente:"Bloque10_RD971_LGTBI_CartaEuropea.docx"},
+  ]
+},
+];
+
+/* ================= ESTADO / PERSISTENCIA ================= */
+
+const STORAGE_KEY = "opo_tecnico_deportivo_v1";
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { theoryRead:{}, quizBest:{}, actionsDone:{}, simulacroBest:null };
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+let state = loadState();
+
+function inRange(d, s, e) { return d >= new Date(s) && d <= new Date(e); }
+const today = new Date(); today.setHours(0,0,0,0);
+const planStart = new Date("2026-07-15");
+const planEnd = new Date("2027-03-31");
+const examDate = new Date("2027-03-15");
+
+function filaHoy() { return calendario.find(r => inRange(today, r[0], r[1])); }
+function faseActual() { return fases.find(f => inRange(today, f.start, f.end)); }
+function getBloque(id) { return bloques.find(b => b.id === id); }
+
+/* Banco unificado de preguntas: agrega todas las preguntas grounded de todos los bloques
+   (temario completo) para poder extraer de ahí el Simulacro completo de 90 preguntas,
+   igual que en el ejercicio real (test de 90 preguntas / 90 minutos). */
+function buildSimulacroPool() {
+  const all = [];
+  bloques.forEach(b => {
+    b.quiz.forEach(q => all.push(Object.assign({}, q, { bloque:b.id, bloqueNombre:b.nombre })));
+  });
+  return all;
+}
+const simulacroPool = buildSimulacroPool();
+const SIMULACRO_SIZE = Math.min(90, simulacroPool.length);
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Acciones: leer teoría + aprobar test (>=60%) por cada bloque de contenido real,
+   más el simulacro completo de 90 preguntas */
+function buildActions() {
+  const acts = [];
+  bloques.forEach(b => {
+    acts.push({ id:"read_"+b.id, label:"Leer teoría — "+b.nombre+" ("+b.titulo+")", type:"read", bloque:b.id });
+    acts.push({ id:"quiz_"+b.id, label:"Aprobar test de práctica (≥60%) — "+b.nombre, type:"quiz", bloque:b.id });
+  });
+  acts.push({ id:"simulacro_full", label:"Aprobar el Simulacro completo ("+SIMULACRO_SIZE+" preguntas, nota ≥ 20/40)", type:"simulacro" });
+  return acts;
+}
+const actions = buildActions();
+
+function isActionDone(a) {
+  if (a.type === "read") return !!state.theoryRead[a.bloque];
+  if (a.type === "quiz") {
+    const qb = state.quizBest[a.bloque];
+    return qb && qb.total > 0 && (qb.score / qb.total) >= 0.6;
+  }
+  if (a.type === "simulacro") {
+    const sb = state.simulacroBest;
+    return sb && sb.nota >= 20;
+  }
+  return false;
+}
+
+/* ================= TABS ================= */
+document.querySelectorAll("nav.tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav.tabs button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll("main > section").forEach(s => s.style.display = "none");
+    document.getElementById("tab-" + btn.dataset.tab).style.display = "block";
+    if (btn.dataset.tab === "progreso") renderProgreso();
+  });
+});
+function goToTab(tab) {
+  document.querySelector('nav.tabs button[data-tab="'+tab+'"]').click();
+}
+
+/* ================= INICIO ================= */
+function renderInicio() {
+  const dias = Math.max(0, Math.round((examDate - today)/86400000));
+  document.getElementById("statDias").textContent = dias;
+  const fa = faseActual();
+  document.getElementById("statFase").textContent = fa ? fa.name : "Fuera de plan";
+  const fh = filaHoy();
+  document.getElementById("statBloque").textContent = fh ? fh[3] : "Repaso libre";
+  const pct = Math.min(100, Math.max(0, Math.round((today - planStart)/(planEnd - planStart)*100)));
+  document.getElementById("statPct").textContent = pct + "%";
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("hoyResumen").textContent = fh
+    ? "Según tu calendario de estudio, hoy toca: " + fh[3] + "."
+    : "No hay bloque asignado para hoy — buen momento para repasar el Bloque Común.";
+
+  const pending = actions.filter(a => !isActionDone(a)).slice(0,5);
+  const box = document.getElementById("todoPreview");
+  box.innerHTML = pending.length
+    ? pending.map(a => '<div class="todo-item"><input type="checkbox" disabled><span class="todo-label">'+a.label+'</span></div>').join("")
+    : "<p class='note'>¡Todo al día! Revisa la pestaña Progreso para más detalle.</p>";
+
+  updateRankBadge();
+}
+document.getElementById("btnIrTeoria").addEventListener("click", () => {
+  goToTab("teoria");
+  const fh = filaHoy();
+  if (fh) openTeoria(fh[2] === "repaso" || fh[2] === "practica" ? "b1" : fh[2]);
+});
+document.getElementById("btnIrPractica").addEventListener("click", () => {
+  goToTab("practica");
+  const fh = filaHoy();
+  const sel = document.getElementById("selectBloqueQuiz");
+  if (fh) sel.value = (fh[2] === "repaso" || fh[2] === "practica") ? "b1" : fh[2];
+});
+
+/* ================= RANKING ================= */
+function computeProgress() {
+  const done = actions.filter(isActionDone).length;
+  return { done, total: actions.length, pct: Math.round(done/actions.length*100) };
+}
+function rankLabel(pct) {
+  if (pct >= 90) return "🏆 Casi funcionario";
+  if (pct >= 70) return "🥇 Opositor Pro";
+  if (pct >= 40) return "🥈 En marcha";
+  if (pct >= 15) return "🥉 Aprendiz";
+  return "🌱 Recién empezando";
+}
+function updateRankBadge() {
+  const { pct } = computeProgress();
+  const label = rankLabel(pct) + " (" + pct + "%)";
+  document.getElementById("rankBadge").textContent = label;
+  const rb2 = document.getElementById("rankBadge2");
+  if (rb2) rb2.textContent = label;
+}
+
+/* ================= TEORIA ================= */
+function renderBloqueListTeoria() {
+  const fh = filaHoy();
+  const box = document.getElementById("bloqueListTeoria");
+  box.innerHTML = bloques.map(b => {
+    const current = fh && fh[2] === b.id;
+    const read = state.theoryRead[b.id];
+    return '<div class="bloque-row'+(current?' current':'')+'" data-id="'+b.id+'">'+
+      '<div><div class="name">'+b.nombre+' — '+b.titulo+'</div><div class="desc">Temas '+b.temas+'</div></div>'+
+      '<div>'+(current?'<span class="badge">hoy</span>':'')+(read?'<span class="badge good">leído</span>':'')+'</div>'+
+    '</div>';
+  }).join("");
+  box.querySelectorAll(".bloque-row").forEach(row => {
+    row.addEventListener("click", () => openTeoria(row.dataset.id));
+  });
+}
+function openTeoria(id) {
+  const b = getBloque(id);
+  if (!b) return;
+  document.getElementById("teoriaViewer").style.display = "block";
+  document.getElementById("teoriaTitulo").textContent = b.nombre + " — " + b.titulo + " (Temas " + b.temas + ")";
+  const linkHtml = b.docUrl
+    ? "<p class='note'>Este resumen está basado directamente en el documento fuente de tu carpeta de Drive. <a href='"+b.docUrl+"' target='_blank' rel='noopener'>Abrir el documento original completo →</a></p>"
+    : "";
+  document.getElementById("teoriaBody").innerHTML = linkHtml + b.teoria.map(sec => "<h3>"+sec.h+"</h3><p>"+sec.p+"</p>").join("");
+  document.getElementById("btnMarcarLeido").dataset.id = id;
+  document.getElementById("btnDesdeTeoriaAPractica").dataset.id = id;
+  document.getElementById("teoriaViewer").scrollIntoView({behavior:"smooth"});
+}
+document.getElementById("btnMarcarLeido").addEventListener("click", (e) => {
+  const id = e.target.dataset.id;
+  state.theoryRead[id] = true;
+  saveState();
+  renderBloqueListTeoria();
+  updateRankBadge();
+  e.target.textContent = "✓ Marcado como leído";
+});
+document.getElementById("btnDesdeTeoriaAPractica").addEventListener("click", (e) => {
+  const id = e.target.dataset.id;
+  goToTab("practica");
+  document.getElementById("selectBloqueQuiz").value = id;
+});
+
+/* ================= PRACTICA (QUIZ) ================= */
+const selectQuiz = document.getElementById("selectBloqueQuiz");
+selectQuiz.innerHTML = bloques.map(b => '<option value="'+b.id+'">'+b.nombre+' — '+b.titulo+'</option>').join("");
+
+let quizState = null;
+document.getElementById("btnEmpezarQuiz").addEventListener("click", () => {
+  const b = getBloque(selectQuiz.value);
+  quizState = { b, qi:0, score:0, answered:false };
+  document.getElementById("quizCard").style.display = "block";
+  document.getElementById("quizTitulo").textContent = "Test — " + b.nombre + " (" + b.titulo + ")";
+  renderQuiz();
+  document.getElementById("quizCard").scrollIntoView({behavior:"smooth"});
+});
+function renderQuiz() {
+  const { b } = quizState;
+  const area = document.getElementById("quizArea");
+  if (quizState.qi >= b.quiz.length) {
+    const prev = state.quizBest[b.id];
+    if (!prev || quizState.score > prev.score || prev.total !== b.quiz.length) {
+      state.quizBest[b.id] = { score: quizState.score, total: b.quiz.length };
+      saveState();
+      updateRankBadge();
+    }
+    const pct = Math.round(quizState.score / b.quiz.length * 100);
+    area.innerHTML = "<div class='quiz-q'>Completado: "+quizState.score+" / "+b.quiz.length+" ("+pct+"%)</div>"+
+      (pct>=60 ? "<p class='note' style='color:var(--good)'>¡Aprobado! Acción marcada como hecha.</p>" : "<p class='note' style='color:var(--bad)'>Por debajo del 60% — repite cuando quieras.</p>")+
+      "<div class='btn-row'><button class='btn' onclick='restartQuiz()'>Repetir</button></div>";
+    return;
+  }
+  const item = b.quiz[quizState.qi];
+  quizState.answered = false;
+  area.innerHTML = "<div class='quiz-q'>Pregunta "+(quizState.qi+1)+" de "+b.quiz.length+": "+item.q+"</div>"+
+    item.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+String.fromCharCode(97+i)+') '+o+'</button>').join("")+
+    "<div class='btn-row'><span class='note' style='align-self:center'>Aciertos: "+quizState.score+"</span><button class='btn' id='nextQuizBtn' disabled>Siguiente</button></div>";
+  area.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (quizState.answered) return;
+      quizState.answered = true;
+      const i = parseInt(btn.dataset.i);
+      area.querySelectorAll(".opt").forEach((b2,i2) => {
+        if (i2 === item.correct) b2.classList.add("correct");
+        else if (i2 === i) b2.classList.add("wrong");
+      });
+      if (i === item.correct) quizState.score++;
+      const note = document.createElement("div");
+      note.className = "note";
+      note.textContent = item.note;
+      area.insertBefore(note, area.querySelector(".btn-row"));
+      document.getElementById("nextQuizBtn").disabled = false;
+    });
+  });
+  document.getElementById("nextQuizBtn").addEventListener("click", () => { quizState.qi++; renderQuiz(); });
+}
+function restartQuiz() { quizState.qi = 0; quizState.score = 0; renderQuiz(); }
+window.restartQuiz = restartQuiz;
+
+/* ================= PRACTICA: MODO (bloque / simulacro) ================= */
+document.getElementById("simulacroPoolSize").textContent = simulacroPool.length;
+document.querySelectorAll(".mode-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".mode-toggle button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const mode = btn.dataset.mode;
+    document.getElementById("practicaBloque").style.display = mode === "bloque" ? "block" : "none";
+    document.getElementById("practicaSimulacro").style.display = mode === "simulacro" ? "block" : "none";
+  });
+});
+
+/* ================= SIMULACRO COMPLETO (90 preguntas) ================= */
+let simState = null;
+let simTimerInterval = null;
+
+document.getElementById("btnEmpezarSimulacro").addEventListener("click", () => {
+  const preguntas = shuffle(simulacroPool).slice(0, SIMULACRO_SIZE);
+  simState = { preguntas, qi:0, aciertos:0, errores:0, enBlanco:0, respuestas:[], answered:false, secondsLeft: 90*60 };
+  document.getElementById("simulacroCard").style.display = "block";
+  document.getElementById("btnEmpezarSimulacro").disabled = true;
+  clearInterval(simTimerInterval);
+  simTimerInterval = setInterval(tickSimTimer, 1000);
+  renderSimulacro();
+  document.getElementById("simulacroCard").scrollIntoView({behavior:"smooth"});
+});
+
+function tickSimTimer() {
+  if (!simState) return;
+  simState.secondsLeft--;
+  const m = Math.floor(Math.max(0,simState.secondsLeft) / 60);
+  const s = Math.max(0,simState.secondsLeft) % 60;
+  document.getElementById("simTimer").textContent = String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  if (simState.secondsLeft <= 0) {
+    clearInterval(simTimerInterval);
+    finishSimulacro(true);
+  }
+}
+
+function renderSimulacro() {
+  const area = document.getElementById("simulacroArea");
+  document.getElementById("simProgresoNum").textContent = simState.qi + "/" + simState.preguntas.length;
+  document.getElementById("simAciertos").textContent = simState.aciertos;
+  document.getElementById("simErrores").textContent = simState.errores;
+
+  if (simState.qi >= simState.preguntas.length) {
+    finishSimulacro(false);
+    return;
+  }
+  const item = simState.preguntas[simState.qi];
+  simState.answered = false;
+  area.innerHTML = "<div class='quiz-q'>Pregunta "+(simState.qi+1)+" de "+simState.preguntas.length+" ("+item.bloqueNombre+"): "+item.q+"</div>"+
+    item.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+String.fromCharCode(97+i)+') '+o+'</button>').join("")+
+    "<div class='btn-row'><button class='btn secondary' id='simBlancoBtn'>Dejar en blanco</button><button class='btn' id='simNextBtn' disabled>Siguiente</button></div>";
+
+  area.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (simState.answered) return;
+      simState.answered = true;
+      const i = parseInt(btn.dataset.i);
+      area.querySelectorAll(".opt").forEach((b2,i2) => {
+        if (i2 === item.correct) b2.classList.add("correct");
+        else if (i2 === i) b2.classList.add("wrong");
+      });
+      if (i === item.correct) simState.aciertos++; else simState.errores++;
+      simState.respuestas.push({ i, correct:item.correct });
+      const note = document.createElement("div");
+      note.className = "note";
+      note.textContent = item.note;
+      area.insertBefore(note, area.querySelector(".btn-row"));
+      document.getElementById("simNextBtn").disabled = false;
+      document.getElementById("simBlancoBtn").disabled = true;
+      document.getElementById("simAciertos").textContent = simState.aciertos;
+      document.getElementById("simErrores").textContent = simState.errores;
+    });
+  });
+  document.getElementById("simBlancoBtn").addEventListener("click", () => {
+    if (simState.answered) return;
+    simState.answered = true;
+    simState.enBlanco++;
+    simState.respuestas.push({ i:null, correct:item.correct });
+    document.getElementById("simNextBtn").disabled = false;
+  });
+  document.getElementById("simNextBtn").addEventListener("click", () => { simState.qi++; renderSimulacro(); });
+}
+
+function finishSimulacro(porTiempo) {
+  clearInterval(simTimerInterval);
+  const total = simState.preguntas.length;
+  const bruta = Math.max(0, simState.aciertos - simState.errores/3);
+  const nota = Math.round((bruta / total) * 40 * 10) / 10;
+  const apto = nota >= 20;
+  if (!state.simulacroBest || nota > state.simulacroBest.nota) {
+    state.simulacroBest = { aciertos: simState.aciertos, errores: simState.errores, enBlanco: simState.enBlanco, total, nota, apto, fecha: new Date().toISOString().slice(0,10) };
+    saveState();
+  }
+  updateRankBadge();
+  document.getElementById("btnEmpezarSimulacro").disabled = false;
+  const area = document.getElementById("simulacroArea");
+  area.innerHTML = "<div class='quiz-q'>"+(porTiempo ? "⏱️ Tiempo agotado. " : "")+"Simulacro completado</div>"+
+    "<p class='note' style='font-size:14px'>Aciertos: "+simState.aciertos+" · Errores: "+simState.errores+" · En blanco: "+simState.enBlanco+" de "+total+"</p>"+
+    "<p class='note' style='font-size:16px;font-weight:700;color:"+(apto?"var(--good)":"var(--bad)")+"'>Nota: "+nota+" / 40 — "+(apto?"APTO":"NO APTO")+" (corte en 20)</p>"+
+    "<p class='note'>Fórmula orientativa: aciertos − errores/3, escalado sobre 40 puntos (las preguntas en blanco no penalizan).</p>"+
+    "<div class='btn-row'><button class='btn' onclick='document.getElementById(\"btnEmpezarSimulacro\").click()'>Repetir simulacro (nuevo sorteo de preguntas)</button></div>";
+}
+
+/* ================= PROGRESO ================= */
+function renderProgreso() {
+  updateRankBadge();
+  const { pct } = computeProgress();
+  document.getElementById("progressFill2").style.width = pct + "%";
+  document.getElementById("progresoTexto").textContent = computeProgress().done + " de " + computeProgress().total + " acciones completadas.";
+
+  const tbody = document.getElementById("tablaProgreso");
+  tbody.innerHTML = bloques.map(b => {
+    const read = state.theoryRead[b.id] ? "<span class='badge good'>Leído</span>" : "<span class='badge warn'>Pendiente</span>";
+    const qb = state.quizBest[b.id];
+    const quizTxt = qb ? qb.score + "/" + qb.total + (qb.score/qb.total>=0.6 ? " ✅" : "") : "—";
+    return "<tr><td>"+b.nombre+"</td><td>"+read+"</td><td>"+quizTxt+"</td></tr>";
+  }).join("");
+
+  const simBox = document.getElementById("simulacroResumen");
+  const sb = state.simulacroBest;
+  simBox.innerHTML = sb
+    ? "Mejor resultado del Simulacro completo ("+sb.total+" preguntas, "+sb.fecha+"): <strong>"+sb.nota+" / 40</strong> — "+(sb.apto?"<span style='color:var(--good)'>APTO</span>":"<span style='color:var(--bad)'>NO APTO</span>")+" · "+sb.aciertos+" aciertos, "+sb.errores+" errores, "+sb.enBlanco+" en blanco."
+    : "Aún no has realizado el Simulacro completo de "+SIMULACRO_SIZE+" preguntas.";
+
+  renderTodoList(currentFilter);
+}
+let currentFilter = "pendiente";
+document.querySelectorAll("#tab-progreso .section-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#tab-progreso .section-toggle button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderTodoList(currentFilter);
+  });
+});
+function renderTodoList(filter) {
+  const box = document.getElementById("todoFull");
+  let list = actions;
+  if (filter === "pendiente") list = actions.filter(a => !isActionDone(a));
+  if (filter === "hecho") list = actions.filter(a => isActionDone(a));
+  box.innerHTML = list.length ? list.map(a => {
+    const done = isActionDone(a);
+    return '<div class="todo-item'+(done?' done':'')+'"><input type="checkbox" '+(done?'checked':'')+' disabled><span class="todo-label">'+a.label+'</span></div>';
+  }).join("") : "<p class='note'>Nada que mostrar aquí.</p>";
+}
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (confirm("¿Seguro que quieres borrar todo tu progreso guardado en este navegador?")) {
+    state = { theoryRead:{}, quizBest:{}, actionsDone:{}, simulacroBest:null };
+    saveState();
+    renderInicio(); renderBloqueListTeoria(); renderProgreso();
+  }
+});
+
+/* ================= INIT ================= */
+renderInicio();
+renderBloqueListTeoria();
+renderProgreso();
+</script>
+</body>
+</html>

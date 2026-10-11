@@ -1,0 +1,16 @@
+{
+  "name": "Portal de Valoración UCR",
+  "short_name": "UCR Valoración",
+  "description": "Cálculo y consulta de valoraciones de la Unidad de Control de Rendimiento (piloto, datos con nombre en clave).",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#1b2a4a",
+  "icons": [
+    {"src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "iconos/icono-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

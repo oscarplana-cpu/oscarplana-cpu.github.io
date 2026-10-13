@@ -1,6 +1,6 @@
 // Portal de Valoración UCR · funcionamiento sin conexión.
 // La página y sus iconos se guardan en el equipo; al publicar una versión nueva, cambia VERSION.
-const VERSION = "ucr-v5.2";
+const VERSION = "ucr-v5.3";
 const ARCHIVOS = ["./", "./index.html", "./manifest.webmanifest", "./iconos/icono-192.png", "./iconos/icono-512.png", "./iconos/icono-512-maskable.png", "./iconos/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(ARCHIVOS)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

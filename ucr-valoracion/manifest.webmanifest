@@ -1,7 +1,7 @@
 {
  "name": "Portal de Valoración UCR",
  "short_name": "UCR Valoración",
- "description": "Cálculo y consulta de valoraciones de la Unidad de Control de Rendimiento (piloto, datos con nombre en clave). © 2026 Óscar Plana Cases. Todos los derechos reservados.",
+ "description": "Cálculo y consulta de valoraciones de la Unidad de Control de Rendimiento (piloto, datos con nombre en clave).",
  "lang": "es",
  "start_url": "./",
  "scope": "./",

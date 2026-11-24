@@ -23,14 +23,15 @@ AQUI = pathlib.Path(__file__).resolve().parent
 b64 = lambda b: base64.b64encode(b).decode()
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--claves", required=True)
+ap.add_argument("--claves", help="archivo claves_app.env; si no se da, usa las variables UCR_PWD_ADMIN y UCR_PWD_LECTURA")
 ap.add_argument("--uso", required=True)
 ap.add_argument("--interno", required=True)
 ap.add_argument("--salida", required=True)
 ap.add_argument("--commit", default="", help="commit de herramienta-ucr que recogen los manuales")
 a = ap.parse_args()
 
-env = dict(l.strip().split("=", 1) for l in pathlib.Path(a.claves).read_text().splitlines() if "=" in l)
+import os
+env = dict(l.strip().split("=", 1) for l in pathlib.Path(a.claves).read_text().splitlines() if "=" in l) if a.claves else {k: os.environ.get(k) for k in ("UCR_PWD_ADMIN", "UCR_PWD_LECTURA")}
 if not env.get("UCR_PWD_ADMIN") or not env.get("UCR_PWD_LECTURA"):
     raise SystemExit("Faltan UCR_PWD_ADMIN o UCR_PWD_LECTURA en el archivo de claves.")
 

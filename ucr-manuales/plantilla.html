@@ -105,7 +105,7 @@ document.getElementById("acceso").addEventListener("submit", async e => {
   docs.length = 0;
   await paquete(llaves.slice(0, 32), DATOS.lectura);
   if (llaves.length >= 64) await paquete(llaves.slice(32, 64), DATOS.admin);
-  const ORDEN = { "Manuales": 0, "Tesis doctoral": 1 }; docs.sort((x, y) => (ORDEN[x.seccion] ?? 9) - (ORDEN[y.seccion] ?? 9));
+  docs.sort((x, y) => x.orden - y.orden);
   pintar();
   document.getElementById("acceso").hidden = true; document.getElementById("panel").hidden = false; document.getElementById("salir").hidden = false;
 });

@@ -46,7 +46,7 @@ def paquete(nivel):
     meta, cuerpo, pos = [], b"", 0
     for d in [d for d in docs if d["nivel"] == nivel]:
         pdf = (carpeta / d["archivo"]).read_bytes()
-        meta.append({"seccion": d["seccion"], "titulo": d["titulo"], "desc": d["desc"], "nombre": d["archivo"], "ini": pos, "fin": pos + len(pdf)})
+        meta.append({"orden": docs.index(d), "seccion": d["seccion"], "titulo": d["titulo"], "desc": d["desc"], "nombre": d["archivo"], "ini": pos, "fin": pos + len(pdf)})
         cuerpo += pdf; pos += len(pdf)
     ind = json.dumps(meta, ensure_ascii=False).encode()
     return len(ind).to_bytes(4, "big") + ind + cuerpo
@@ -73,7 +73,7 @@ html = (AQUI / "plantilla.html").read_text(encoding="utf-8").replace("/*DATOS*/n
 for t in (env["UCR_MANUALES_PWD_ADMIN"], env["UCR_MANUALES_PWD_LECTURA"]):
     assert t not in html, "Una contraseña ha acabado en el HTML"
 for d in docs:
-    assert d["titulo"] not in html, "Un título ha quedado en claro en el HTML"
+    assert d["titulo"] not in html and d["seccion"] not in html.replace("Manuales", ""), "Un título o apartado ha quedado en claro en el HTML"
 sal = pathlib.Path(a.salida); sal.mkdir(parents=True, exist_ok=True)
 (sal / "index.html").write_text(html, encoding="utf-8")
 if not (sal / "config.json").exists():

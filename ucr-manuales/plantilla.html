@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Manuales · Portal de Valoración UCR</title>
+<style>
+  :root { --tinta:#1d2733; --suave:#5b6773; --linea:#d9dee3; --fondo:#f6f7f8; --acento:#1f5fa8; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--tinta); background:var(--fondo); }
+  header { background:#fff; border-bottom:1px solid var(--linea); padding:14px 24px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:17px; margin:0; font-weight:650; }
+  header .sub { color:var(--suave); font-size:13px; }
+  header .der { margin-left:auto; display:flex; gap:8px; }
+  main { max-width:1100px; margin:0 auto; padding:24px; }
+  .caja { background:#fff; border:1px solid var(--linea); border-radius:8px; padding:20px; }
+  #acceso { max-width:380px; margin:60px auto; }
+  #acceso label { display:block; font-weight:600; margin-bottom:8px; }
+  input[type=password] { width:100%; padding:10px 12px; font-size:15px; border:1px solid var(--linea); border-radius:6px; }
+  button, a.btn { font:inherit; font-size:14px; padding:8px 14px; border-radius:6px; border:1px solid var(--linea); background:#fff; color:var(--tinta); cursor:pointer; text-decoration:none; display:inline-block; }
+  button.prim, a.prim { background:var(--acento); border-color:var(--acento); color:#fff; }
+  #acceso button { margin-top:12px; width:100%; }
+  #error { color:#b3261e; font-size:13px; min-height:20px; margin-top:8px; }
+  .lista { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+  .lista h2 { font-size:16px; margin:0 0 4px; }
+  .lista p { margin:0 0 14px; color:var(--suave); font-size:13.5px; }
+  .lista .acc { display:flex; gap:8px; }
+  #visor { margin-top:20px; }
+  #visor iframe { width:100%; height:80vh; border:1px solid var(--linea); border-radius:8px; background:#fff; }
+  footer { color:var(--suave); font-size:12px; text-align:center; padding:24px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Manuales · Portal de Valoración UCR</h1><div class="sub">Unidad de Control del Rendimiento · CAR de Madrid</div></div>
+  <div class="der"><a class="btn" id="ir-ucr" hidden target="_blank" rel="noopener">Abrir la herramienta UCR</a><button id="salir" hidden>Salir</button></div>
+</header>
+<main>
+  <form class="caja" id="acceso" autocomplete="off">
+    <label for="pwd">Contraseña</label>
+    <input type="password" id="pwd" autofocus>
+    <button class="prim" type="submit" id="entrar">Entrar</button>
+    <div id="error"></div>
+  </form>
+  <section id="panel" hidden>
+    <div class="lista">
+      <div class="caja"><h2>Manual de uso</h2><p>Para los técnicos de la UCR: pantallas, herramientas, informes y de dónde sale cada dato.</p>
+        <div class="acc"><button class="prim" data-ver="uso">Ver</button><a class="btn" data-bajar="uso">Descargar PDF</a></div></div>
+      <div class="caja" id="caja-interno" hidden><h2>Manual interno</h2><p>Solo para el autor: arquitectura, agentes, cálculo, publicación y seguridad.</p>
+        <div class="acc"><button class="prim" data-ver="interno">Ver</button><a class="btn" data-bajar="interno">Descargar PDF</a></div></div>
+    </div>
+    <div id="visor" hidden><iframe id="marco" title="Manual"></iframe></div>
+  </section>
+</main>
+<footer>© 2026 Óscar Plana Cases. Todos los derechos reservados. <span id="fecha"></span></footer>
+<script>
+const DATOS = /*DATOS*/null;
+const NOMBRES = { uso: "Manual_de_uso_Portal_UCR.pdf", interno: "Manual_interno_Portal_UCR.pdf" };
+const de64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const urls = {};
+document.getElementById("fecha").textContent = "Versión del " + DATOS.fecha + ".";
+
+fetch("config.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(c => {
+  if (c && c.conexion_ucr === true && c.url_herramienta) { const a = document.getElementById("ir-ucr"); a.href = c.url_herramienta; a.hidden = false; }
+}).catch(() => {});
+
+async function abrir(pwd) {
+  for (const ll of DATOS.llaves) {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pwd), "PBKDF2", false, ["deriveKey"]);
+    const k = await crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt: de64(ll.sal), iterations: DATOS.iter }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    try { return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: de64(ll.iv) }, k, de64(ll.ct))); } catch (e) {}
+  }
+  return null;
+}
+async function descifrar(bytesClave, bloque) {
+  const k = await crypto.subtle.importKey("raw", bytesClave, "AES-GCM", false, ["decrypt"]);
+  const pdf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: de64(bloque.iv) }, k, de64(bloque.ct));
+  return URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
+}
+document.getElementById("acceso").addEventListener("submit", async e => {
+  e.preventDefault();
+  const err = document.getElementById("error"), btn = document.getElementById("entrar");
+  err.textContent = ""; btn.disabled = true; btn.textContent = "Abriendo…";
+  const llaves = await abrir(document.getElementById("pwd").value);
+  document.getElementById("pwd").value = "";
+  btn.disabled = false; btn.textContent = "Entrar";
+  if (!llaves) { err.textContent = "Contraseña incorrecta."; return; }
+  urls.uso = await descifrar(llaves.slice(0, 32), DATOS.uso);
+  if (llaves.length >= 64) { urls.interno = await descifrar(llaves.slice(32, 64), DATOS.interno); document.getElementById("caja-interno").hidden = false; }
+  document.querySelectorAll("[data-bajar]").forEach(a => { const k = a.dataset.bajar; if (urls[k]) { a.href = urls[k]; a.download = NOMBRES[k]; } });
+  document.getElementById("acceso").hidden = true; document.getElementById("panel").hidden = false; document.getElementById("salir").hidden = false;
+});
+document.addEventListener("click", e => {
+  const k = e.target.dataset && e.target.dataset.ver;
+  if (k && urls[k]) { document.getElementById("marco").src = urls[k]; document.getElementById("visor").hidden = false; document.getElementById("visor").scrollIntoView({ behavior: "smooth" }); }
+  if (e.target.id === "salir") location.reload();
+});
+</script>
+</body>
+</html>

@@ -12,8 +12,10 @@ Web aparte de la herramienta, para tener siempre a mano los dos manuales en PDF.
 
 ## Actualizar los manuales
 
+Regla: los dos manuales, sus PDF y esta web se actualizan como mínimo al final de cada día en que cambie la herramienta. Una tarea programada lo revisa cada noche.
+
 1. Exportar cada doc a PDF (A4).
-2. `python3 construir_manuales.py --claves <ruta privada>/claves_app.env --uso Manual_de_uso_Portal_UCR.pdf --interno Manual_interno_Portal_UCR.pdf --salida <repo>/ucr-manuales`
+2. `python3 construir_manuales.py --claves <ruta privada>/claves_app.env --uso Manual_de_uso_Portal_UCR.pdf --interno Manual_interno_Portal_UCR.pdf --salida <repo>/ucr-manuales --commit <commit de herramienta-ucr>`
 3. Commit y push del repositorio `oscarplana-cpu.github.io`.
 
 Los PDF en claro se guardan solo en tu equipo o en tu Drive, nunca en el repositorio.

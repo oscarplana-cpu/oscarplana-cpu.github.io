@@ -10,6 +10,7 @@ Uso:
       --uso Manual_de_uso_Portal_UCR.pdf --interno Manual_interno_Portal_UCR.pdf \
       --salida /ruta/al/repo/oscarplana-cpu.github.io/ucr-manuales
 
+version.json guarda la fecha y el commit de la herramienta que recogen los manuales.
 La conexión con la herramienta UCR se activa o desactiva en config.json (no hace falta volver a construir).
 """
 import argparse, base64, json, pathlib, secrets, datetime
@@ -26,6 +27,7 @@ ap.add_argument("--claves", required=True)
 ap.add_argument("--uso", required=True)
 ap.add_argument("--interno", required=True)
 ap.add_argument("--salida", required=True)
+ap.add_argument("--commit", default="", help="commit de herramienta-ucr que recogen los manuales")
 a = ap.parse_args()
 
 env = dict(l.strip().split("=", 1) for l in pathlib.Path(a.claves).read_text().splitlines() if "=" in l)
@@ -57,4 +59,5 @@ if not (sal / "config.json").exists():
     (sal / "config.json").write_text((AQUI / "config.json").read_text(encoding="utf-8"), encoding="utf-8")
 for t in (env["UCR_PWD_ADMIN"], env["UCR_PWD_LECTURA"]):
     assert t not in html, "Una contraseña ha acabado en el HTML"
+(sal / "version.json").write_text(json.dumps({"fecha": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "commit_herramienta": a.commit}, indent=2) + "\n", encoding="utf-8")
 print("index.html:", round(len(html) / 1e6, 2), "MB ->", sal)

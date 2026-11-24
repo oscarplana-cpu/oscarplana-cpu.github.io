@@ -1,5 +1,5 @@
 {
-  "conexion_ucr": false,
+  "conexion_ucr": true,
   "url_herramienta": "https://oscarplana-cpu.github.io/ucr-valoracion/",
   "_nota": "Pon conexion_ucr en true para que aparezca el botón 'Abrir la herramienta UCR'. En false la web de manuales no menciona la herramienta."
 }
